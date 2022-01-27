@@ -3,8 +3,10 @@ import 'ongoing.dart';
 
 class ClickableTextBlock extends StatefulWidget {
   final String lineNum;
+  final String id;
 
-  const ClickableTextBlock({Key? key, required this.lineNum}) : super(key: key);
+  const ClickableTextBlock({Key? key, required this.lineNum, required this.id})
+      : super(key: key);
 
   @override
   _ClickableTextBlockState createState() => _ClickableTextBlockState();
@@ -18,7 +20,8 @@ class _ClickableTextBlockState extends State<ClickableTextBlock> {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => OnGoing(lineNum: widget.lineNum)),
+              builder: (context) =>
+                  OnGoing(lineNum: widget.lineNum, id: widget.id)),
         );
         print("Tapped on container");
       },

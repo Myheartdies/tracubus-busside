@@ -43,6 +43,7 @@ dependencies:
   geolocator_web: ^2.1.4
   web_socket_channel: ^2.1.0
   json_serializable: ^6.1.4
+  device_info_plus: ^3.2.1
 
 dev_dependencies:
   flutter_test:
