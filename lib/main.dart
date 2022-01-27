@@ -1,6 +1,6 @@
-
 import 'package:flutter/material.dart';
 import 'home_page.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -20,10 +20,9 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
-     // home: TestPage(),
-     //home: GpsTest(),
-     //home:SocketTest(),
+      // home: TestPage(),
+      //home: GpsTest(),
+      //home:SocketTest(),
     );
   }
 }
-
