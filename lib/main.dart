@@ -1,10 +1,6 @@
 
 import 'package:flutter/material.dart';
 import 'home_page.dart';
-//import 'web_test.dart';
-//import 'gps_test.dart';
-//import 'sockettest.dart';
-//import 'gps_test_geo.dart';//deprecated
 void main() {
   runApp(const MyApp());
 }

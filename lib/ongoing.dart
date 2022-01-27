@@ -1,19 +1,25 @@
+import 'dart:io';
+import 'dart:convert';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import "package:web_socket_channel/web_socket_channel.dart";
-//import 'info_sender.dart';
-import 'dart:convert';
+
 import 'package:location/location.dart';
-import 'dart:async';
+import 'package:device_info_plus/device_info_plus.dart';
 
 class OnGoing extends StatefulWidget {
   final String lineNum;
-  const OnGoing({Key? key, required this.lineNum}) : super(key: key);
+  final String id;
+  const OnGoing({Key? key, required this.lineNum, required this.id})
+      : super(key: key);
 
   @override
   _OnGoingState createState() => _OnGoingState();
 }
 
 class _OnGoingState extends State<OnGoing> {
+  String id='';
   final _channel = WebSocketChannel.connect(
       Uri.parse("ws://13.251.160.105:8080/api/gps-info"));
   Location location = new Location();
@@ -45,13 +51,26 @@ class _OnGoingState extends State<OnGoing> {
   @override
   void initState() {
     super.initState();
+    id=widget.id;
     Timer.periodic(const Duration(milliseconds: 1300), (timer) {
       int now = DateTime.now().second;
       if (_locationData != null) {
         _SendMessage(widget.lineNum, _locationData.longitude!,
-            _locationData.speed!, _locationData.latitude!, timestamp);
+            _locationData.speed!, _locationData.latitude!, timestamp,id);
       }
     });
+    initId();
+  }
+
+  Future<void> initId() async {
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    if (Platform.isAndroid) {
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      id = androidInfo.androidId!;
+    } else if (Platform.isIOS) {
+      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+      id = iosInfo.identifierForVendor!;
+    }
   }
 
   @override
@@ -68,12 +87,11 @@ class _OnGoingState extends State<OnGoing> {
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       var loc = snapshot.data as LocationData;
-                      // DateTime currentPhoneDate = DateTime.now();
                       if (loc != null) {
-                     //   setState(() {
-                          _locationData = loc;
-                          timestamp = DateTime.now().microsecondsSinceEpoch;
-                     //   });
+                        //   setState(() {
+                        _locationData = loc;
+                        timestamp = DateTime.now().microsecondsSinceEpoch;
+                        //   });
                       }
                       return Container();
                       //  return Text((loc.longitude!+loc.latitude!+loc.speed!).toString());
@@ -188,7 +206,6 @@ class _OnGoingState extends State<OnGoing> {
     _permissionGranted = await location.hasPermission();
     if (_permissionGranted == PermissionStatus.denied) {
       print("permission denied");
-      //  locationMsg = 'permission denied';
       _permissionGranted = await location.requestPermission();
       if (_permissionGranted != PermissionStatus.granted) {
         return;
@@ -200,14 +217,16 @@ class _OnGoingState extends State<OnGoing> {
 
 //Send json with address message to server
   void _SendMessage(
-      String route, double longit, double speed, double latit, int time) {
+      String route, double longit, double speed, double latit, int time,String id) {
     print(time);
+    //  print("df");
     _channel.sink.add(jsonEncode({
       "route": route,
       "longitude": longit,
       "speed": speed,
       "latitude": latit,
       "timestamp": time,
+      "id": id,
     }));
   }
 }
