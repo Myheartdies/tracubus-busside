@@ -111,19 +111,6 @@ class _OnGoingState extends State<OnGoing> {
                 ),
               ),
               Contoured(widget.lineNum),
-              // Container(
-              //   //padding: EdgeInsets.all(8.0),
-              //   alignment: Alignment.center,
-              //   child: Text(
-              //     widget.lineNum,
-              //     textAlign: TextAlign.center,
-              //     style: TextStyle(
-              //       color: colormap[widget.lineNum],
-              //       fontSize: 180,
-              //       fontWeight: FontWeight.w500,
-              //     ),
-              //   ),
-              // ),
               Container(
                 padding: const EdgeInsets.all(8.0),
                 alignment: Alignment.center,
@@ -218,7 +205,7 @@ class _OnGoingState extends State<OnGoing> {
       int time, String Id) {
     print(time);
     //print(id);
-    int did=int.parse(Id);
+    int did = int.parse(Id);
     print(did);
     _channel.sink.add(jsonEncode({
       "route": route,
