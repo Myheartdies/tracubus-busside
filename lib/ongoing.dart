@@ -215,17 +215,18 @@ class _OnGoingState extends State<OnGoing> {
 
 //Send json with address message to server
   void _SendMessage(String route, double longit, double speed, double latit,
-      int time, String id) {
+      int time, String Id) {
     print(time);
-    print(id);
-    //  print("df");
+    //print(id);
+    int did=int.parse(Id);
+    print(did);
     _channel.sink.add(jsonEncode({
       "route": route,
       "longitude": longit,
       "speed": speed,
       "latitude": latit,
       "timestamp": time,
-      "id": id,
+      "id": did,
     }));
   }
 }
