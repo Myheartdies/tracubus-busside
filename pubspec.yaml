@@ -44,6 +44,7 @@ dependencies:
   web_socket_channel: ^2.1.0
   json_serializable: ^6.1.4
   device_info_plus: ^3.2.1
+  unique_identifier: ^0.2.2
 
 dev_dependencies:
   flutter_test:

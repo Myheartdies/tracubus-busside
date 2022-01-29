@@ -7,6 +7,7 @@ import "package:web_socket_channel/web_socket_channel.dart";
 
 import 'package:location/location.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+//import 'package:unique_identifier/unique_identifier.dart';
 
 class OnGoing extends StatefulWidget {
   final String lineNum;
@@ -19,6 +20,7 @@ class OnGoing extends StatefulWidget {
 }
 
 class _OnGoingState extends State<OnGoing> {
+  //TODO: Implement the function of recording the positions
   String id = '';
   final _channel = WebSocketChannel.connect(
       Uri.parse("ws://20.24.96.85:4242/api/gps-info"));
@@ -44,10 +46,10 @@ class _OnGoingState extends State<OnGoing> {
 
   void dispose() {
     _channel.sink.close();
-    //  _controller.dispose();
     super.dispose();
   }
 
+//TODO: implement getting the IMEI and parse it to int
   @override
   void initState() {
     super.initState();
@@ -205,15 +207,15 @@ class _OnGoingState extends State<OnGoing> {
       int time, String Id) {
     print(time);
     //print(id);
-    int did = int.parse(Id);
-    print(did);
+    //int did = int.parse(Id);
+    print(Id);
     _channel.sink.add(jsonEncode({
       "route": route,
       "longitude": longit,
       "speed": speed,
       "latitude": latit,
       "timestamp": time,
-      "id": did,
+      "id": Id,
     }));
   }
 }
