@@ -21,7 +21,7 @@ class OnGoing extends StatefulWidget {
 class _OnGoingState extends State<OnGoing> {
   String id = '';
   final _channel = WebSocketChannel.connect(
-      Uri.parse("ws://13.251.160.105:8080/api/gps-info"));
+      Uri.parse("ws://20.24.96.85:4242/api/gps-info"));
   Location location = new Location();
   late bool _serviceEnabled;
   late PermissionStatus _permissionGranted;

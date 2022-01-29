@@ -35,8 +35,8 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   http: ^0.13.4
-  sse_client: ^0.1.0
-  sse: ^4.1.0
+ # sse_client: ^0.1.0
+ # sse: ^4.1.0
   html: ^0.15.0
   location: ^4.3.0
   geolocator: ^8.0.3
