@@ -14,5 +14,4 @@ class RecordModel extends ChangeNotifier {
     //notifyListeners();
     return _records;
   }
-
 }

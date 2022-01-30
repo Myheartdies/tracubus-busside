@@ -222,7 +222,7 @@ class _OnGoingState extends State<OnGoing> {
       "id": Id,
     };
     Provider.of<RecordModel>(context,listen: false).store(info);
-    Provider.of<RecordModel>(context,listen: false).view();
+    print(info.toString());
     _channel.sink.add(jsonEncode(info));
   }
 }
