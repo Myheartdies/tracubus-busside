@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:bus_side/record_model.dart';
+import 'package:bus_side/view_record.dart';
 import 'package:flutter/material.dart';
 import 'package:html/parser.dart';
 import 'text_block_clickable.dart';
@@ -23,17 +24,9 @@ class _MyHomePageState extends State<MyHomePage> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          // Here we take the value from the MyHomePage object that was created by
-          // the App.build method, and use it to set our appbar title.
           title: const Text("选择你的路线"),
-          leading: GestureDetector(
-            onTap: () {
-              Provider.of<RecordModel>(context, listen: false).view();
-            },
-            child: Icon(
-              Icons.add,
-            ),
-          ),
+          //The button here is for debug purpose
+          leading: recordButton(), //TODO: Remove it when release
         ),
         body: Center(
           child: Column(
@@ -75,5 +68,21 @@ class _MyHomePageState extends State<MyHomePage> {
           for (String a in line)
             Expanded(child: ClickableTextBlock(lineNum: a, id: id)),
         ]);
+  }
+
+  //TODO: Remove it
+  Widget recordButton() {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => ViewRecord()),
+        );
+        Provider.of<RecordModel>(context, listen: false).view();
+      },
+      child: Icon(
+        Icons.add,
+      ),
+    );
   }
 }

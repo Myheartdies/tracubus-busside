@@ -10,11 +10,8 @@ class RecordModel extends ChangeNotifier {
 
   List view() {
     print(_records);
-    notifyListeners();
+   // notifyListeners();
     return _records;
   }
-  void writeToFile() async{
-    final filename = 'record.txt';
-    var file = await File(filename).writeAsString(_records.toString());
-  }
+
 }
