@@ -1,12 +1,13 @@
 import 'dart:io';
 import 'dart:convert';
 import 'dart:async';
+import 'dart:math';
 
 import 'package:bus_side/record_model.dart';
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/io.dart';
 import "package:web_socket_channel/web_socket_channel.dart";
-import 'package:web_socket_channel/status.dart' as status;
+// import 'package:web_socket_channel/status.dart' as status;
 
 import 'package:location/location.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -24,7 +25,8 @@ class OnGoing extends StatefulWidget {
 
 class _OnGoingState extends State<OnGoing> {
   String id = '';
-  bool connected = false;
+  // bool connected = false;
+  String status = "no";
   late WebSocketChannel _channel;
   var listener;
   Location location = new Location();
@@ -61,15 +63,17 @@ class _OnGoingState extends State<OnGoing> {
   @override
   void initState() {
     super.initState();
-    connect();
-    checkCon();
     id = widget.id;
     _timer = Timer.periodic(const Duration(milliseconds: 1300), (timer) {
-      if (!connected) {
+      if (status == "no") {
+        setState(() {
+          status = "connecting";
+        });
         connect();
-        checkCon();
       }
-      if (connected) {
+      if (status == "connecting") {
+      }
+      if (status == "yes") {
         _SendMessage(widget.lineNum, _locationData.longitude!,
             _locationData.speed!, _locationData.latitude!, timestamp, id);
       }
@@ -77,13 +81,49 @@ class _OnGoingState extends State<OnGoing> {
     initId();
   }
 
-  connect()  {
-    print("connecting");
-    _channel =  IOWebSocketChannel.connect(
-        Uri.parse("ws://20.24.96.85:4242/api/gps-info"),
-        pingInterval: Duration(milliseconds: 5000));
-    setState(() {
-      connected = true;
+  // connect() {
+  //   print("connecting");
+  //   _channel = IOWebSocketChannel.connect(
+  //       Uri.parse("ws://20.24.96.85:4242/api/gps-info"),
+  //       //   Uri.parse("ws://12.251.160.105:4242/api/gps-info"),
+  //       pingInterval: Duration(milliseconds: 5000));
+  //   setState(() {
+  //     connected = true;
+  //   });
+  // }
+
+  connect() {
+    Random r = new Random();
+    String key = base64.encode(List<int>.generate(8, (_) => r.nextInt(255)));
+
+    HttpClient client = HttpClient();
+    client
+        .getUrl(Uri.parse("http://20.24.96.85:4242/api/gps-info"))
+        .timeout(Duration(seconds: 10))
+        .then((request) {
+      request.headers.add('Connection', 'upgrade');
+      request.headers.add('Upgrade', 'websocket');
+      request.headers.add('sec-websocket-version', '13');
+      request.headers.add('sec-websocket-key', key);
+
+      request.close().then((response) {
+        response.detachSocket().then((socket) {
+          final webSocket =
+              WebSocket.fromUpgradedSocket(socket, serverSide: false);
+          webSocket.pingInterval = Duration(milliseconds: 5000);
+          _channel = IOWebSocketChannel(webSocket);
+          checkCon();
+          setState(() {
+            status = "yes";
+          });
+        });
+      });
+    }).catchError((error) {
+      print(error);
+      setState(() {
+        status = "no";
+      });
+      return null;
     });
   }
 
@@ -97,17 +137,15 @@ class _OnGoingState extends State<OnGoing> {
         debugPrint('ws channel closed');
         // print("connection closed abnormally, need reconnection");
         setState(() {
-          connected = false;
+          status = "no";
         });
-        // checkCon();
       },
       onError: (error) {
         print(timestamp);
         debugPrint('ws error $error');
         setState(() {
-          connected = false;
+          status = "no";
         });
-        //  checkCon();
       },
     );
   }
