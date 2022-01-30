@@ -10,10 +10,8 @@ class ViewRecord extends StatefulWidget {
 }
 
 class _ViewRecordState extends State<ViewRecord> {
-  var items;
   @override
   void initState() {
-    //  items=Provider.of<RecordModel>(context, listen: false).view();
     super.initState();
   }
 
@@ -24,7 +22,7 @@ class _ViewRecordState extends State<ViewRecord> {
           appBar: AppBar(
             title: Text("the record is here"),
           ),
-          body: //Center(child: Text(Provider.of<RecordModel>(context, listen: false).view().toString()),),
+          body: 
               ListView.builder(
                   itemCount: (model == null) ? 0 : model.records.length,
                   itemBuilder: (BuildContext context, int index) {

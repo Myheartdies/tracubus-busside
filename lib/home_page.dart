@@ -53,7 +53,7 @@ class _MyHomePageState extends State<MyHomePage> {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     if (Platform.isAndroid) {
       AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      id = androidInfo.androidId!.substring(8);
+      id = androidInfo.androidId!;
     } else if (Platform.isIOS) {
       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
       id = iosInfo.identifierForVendor!;
@@ -76,11 +76,11 @@ class _MyHomePageState extends State<MyHomePage> {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => ViewRecord()),
+          MaterialPageRoute(builder: (context) => const ViewRecord()),
         );
         Provider.of<RecordModel>(context, listen: false).view();
       },
-      child: Icon(
+      child: const Icon(
         Icons.add,
       ),
     );

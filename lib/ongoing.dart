@@ -4,12 +4,13 @@ import 'dart:async';
 
 import 'package:bus_side/record_model.dart';
 import 'package:flutter/material.dart';
+import 'package:web_socket_channel/io.dart';
 import "package:web_socket_channel/web_socket_channel.dart";
+import 'package:web_socket_channel/status.dart' as status;
 
 import 'package:location/location.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:provider/provider.dart';
-//import 'package:unique_identifier/unique_identifier.dart';
 
 class OnGoing extends StatefulWidget {
   final String lineNum;
@@ -22,10 +23,10 @@ class OnGoing extends StatefulWidget {
 }
 
 class _OnGoingState extends State<OnGoing> {
-  //TODO: Implement the function of recording the positions
   String id = '';
-  final _channel = WebSocketChannel.connect(
-      Uri.parse("ws://20.24.96.85:4242/api/gps-info"));
+  bool connected = false;
+  late WebSocketChannel _channel;
+  var listener;
   Location location = new Location();
   late bool _serviceEnabled;
   late PermissionStatus _permissionGranted;
@@ -50,6 +51,9 @@ class _OnGoingState extends State<OnGoing> {
   void dispose() {
     _channel.sink.close();
     _timer.cancel();
+    if (listener != null) {
+      listener.cancel();
+    }
     super.dispose();
   }
 
@@ -57,9 +61,13 @@ class _OnGoingState extends State<OnGoing> {
   @override
   void initState() {
     super.initState();
+    connect();
     id = widget.id;
-    _timer=Timer.periodic(const Duration(milliseconds: 1300), (timer) {
-      int now = DateTime.now().second;
+    _timer = Timer.periodic(const Duration(milliseconds: 1300), (timer) {
+      if (!connected) {
+        connect();
+        checkCon();
+      }
       if (_locationData != null) {
         _SendMessage(widget.lineNum, _locationData.longitude!,
             _locationData.speed!, _locationData.latitude!, timestamp, id);
@@ -68,11 +76,45 @@ class _OnGoingState extends State<OnGoing> {
     initId();
   }
 
+  connect() async {
+    print("connecting");
+    _channel = await IOWebSocketChannel.connect(
+        Uri.parse("ws://20.24.96.85:4242/api/gps-info"),
+        pingInterval: Duration(seconds: 6));
+    setState(() {
+      connected = true;
+    });
+  }
+
+  void checkCon() {
+    listener = _channel.stream.listen(
+      (dynamic message) {
+        debugPrint('message $message');
+      },
+      onDone: () {
+        debugPrint('ws channel closed');
+        // print("connection closed abnormally, need reconnection");
+        setState(() {
+          connected = false;
+        });
+        // checkCon();
+      },
+      onError: (error) {
+        print(timestamp);
+        debugPrint('ws error $error');
+        setState(() {
+          connected = false;
+        });
+        //  checkCon();
+      },
+    );
+  }
+
   Future<void> initId() async {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     if (Platform.isAndroid) {
       AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      id = androidInfo.androidId!.substring(8);
+      id = androidInfo.androidId!;
     } else if (Platform.isIOS) {
       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
       id = iosInfo.identifierForVendor!;
@@ -99,8 +141,9 @@ class _OnGoingState extends State<OnGoing> {
                       }
                       return Container();
                       //  return Text((loc.longitude!+loc.latitude!+loc.speed!).toString());
-                    } else
+                    } else {
                       return Container();
+                    }
                   }),
               Container(
                 padding: const EdgeInsets.all(8.0),
@@ -172,8 +215,8 @@ class _OnGoingState extends State<OnGoing> {
               color: colormap[input],
               fontSize: 180,
               fontWeight: FontWeight.w500,
-              shadows: [
-                const Shadow(
+              shadows: const [
+                Shadow(
                   // bottomLeft
                   offset: Offset(2, 2),
                   color: Color.fromARGB(66, 29, 29, 29),
@@ -202,18 +245,16 @@ class _OnGoingState extends State<OnGoing> {
         return;
       }
     }
-    // print("asdfs");
     _locationData = await location.getLocation();
   }
 
 //Send json with address message to server
   void _SendMessage(String route, double longit, double speed, double latit,
       int time, String Id) {
-    print(time);
-    //print(id);
+    // debugPrint(time.toString());
+    print("id" + Id);
     //int did = int.parse(Id);
-    print(Id);
-    var info={
+    var info = {
       "route": route,
       "longitude": longit,
       "speed": speed,
@@ -221,8 +262,8 @@ class _OnGoingState extends State<OnGoing> {
       "timestamp": time,
       "id": Id,
     };
-    Provider.of<RecordModel>(context,listen: false).store(info);
-    print(info.toString());
+    Provider.of<RecordModel>(context, listen: false).store(info);
+    // debugPrint(info.toString());
     _channel.sink.add(jsonEncode(info));
   }
 }
