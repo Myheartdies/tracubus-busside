@@ -2,11 +2,13 @@ import 'dart:io';
 import 'dart:convert';
 import 'dart:async';
 
+import 'package:bus_side/record_model.dart';
 import 'package:flutter/material.dart';
 import "package:web_socket_channel/web_socket_channel.dart";
 
 import 'package:location/location.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:provider/provider.dart';
 //import 'package:unique_identifier/unique_identifier.dart';
 
 class OnGoing extends StatefulWidget {
@@ -29,6 +31,7 @@ class _OnGoingState extends State<OnGoing> {
   late PermissionStatus _permissionGranted;
   late LocationData _locationData;
   late int timestamp;
+  late Timer _timer;
   var colormap = {
     '1A': const Color.fromARGB(255, 225, 221, 52),
     '1B': const Color.fromARGB(255, 225, 221, 52),
@@ -46,6 +49,7 @@ class _OnGoingState extends State<OnGoing> {
 
   void dispose() {
     _channel.sink.close();
+    _timer.cancel();
     super.dispose();
   }
 
@@ -54,7 +58,7 @@ class _OnGoingState extends State<OnGoing> {
   void initState() {
     super.initState();
     id = widget.id;
-    Timer.periodic(const Duration(milliseconds: 1300), (timer) {
+    _timer=Timer.periodic(const Duration(milliseconds: 1300), (timer) {
       int now = DateTime.now().second;
       if (_locationData != null) {
         _SendMessage(widget.lineNum, _locationData.longitude!,
@@ -209,13 +213,16 @@ class _OnGoingState extends State<OnGoing> {
     //print(id);
     //int did = int.parse(Id);
     print(Id);
-    _channel.sink.add(jsonEncode({
+    var info={
       "route": route,
       "longitude": longit,
       "speed": speed,
       "latitude": latit,
       "timestamp": time,
       "id": Id,
-    }));
+    };
+    Provider.of<RecordModel>(context,listen: false).store(info);
+    Provider.of<RecordModel>(context,listen: false).view();
+    _channel.sink.add(jsonEncode(info));
   }
 }

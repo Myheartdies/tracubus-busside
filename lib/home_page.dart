@@ -1,9 +1,11 @@
 import 'dart:io';
 
+import 'package:bus_side/record_model.dart';
 import 'package:flutter/material.dart';
 import 'package:html/parser.dart';
 import 'text_block_clickable.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:provider/provider.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key, required this.title}) : super(key: key);
@@ -24,10 +26,16 @@ class _MyHomePageState extends State<MyHomePage> {
           // Here we take the value from the MyHomePage object that was created by
           // the App.build method, and use it to set our appbar title.
           title: const Text("选择你的路线"),
+          leading: GestureDetector(
+            onTap: () {
+              Provider.of<RecordModel>(context, listen: false).view();
+            },
+            child: Icon(
+              Icons.add,
+            ),
+          ),
         ),
         body: Center(
-          // Center is a layout widget. It takes a single child and positions it
-          // in the middle of the parent.
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
@@ -35,7 +43,6 @@ class _MyHomePageState extends State<MyHomePage> {
               Expanded(child: expandedRow(['3', '4', '5'])),
               Expanded(child: expandedRow(['6A', '6B', '7'])),
               Expanded(child: expandedRow(['8', 'N', 'H'])),
-              //Expanded(child: expandedRow(['H', 'N'])),
             ],
           ),
         ),

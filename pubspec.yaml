@@ -45,6 +45,7 @@ dependencies:
   json_serializable: ^6.1.4
   device_info_plus: ^3.2.1
   unique_identifier: ^0.2.2
+  provider: ^6.0.2
 
 dev_dependencies:
   flutter_test:

@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'home_page.dart';
+import 'record_model.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create:(context) => RecordModel(),
+      child:const MyApp() ,)
+    );
 }
 
 class MyApp extends StatelessWidget {
+
   const MyApp({Key? key}) : super(key: key);
 
   // This widget is the root of your application.
@@ -19,10 +26,7 @@ class MyApp extends StatelessWidget {
 
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-      // home: TestPage(),
-      //home: GpsTest(),
-      //home:SocketTest(),
+      home: const MyHomePage(title: 'Flutter Demo Home Page'),      
     );
   }
 }
