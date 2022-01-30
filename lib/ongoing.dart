@@ -62,13 +62,14 @@ class _OnGoingState extends State<OnGoing> {
   void initState() {
     super.initState();
     connect();
+    checkCon();
     id = widget.id;
     _timer = Timer.periodic(const Duration(milliseconds: 1300), (timer) {
       if (!connected) {
         connect();
         checkCon();
       }
-      if (_locationData != null) {
+      if (connected) {
         _SendMessage(widget.lineNum, _locationData.longitude!,
             _locationData.speed!, _locationData.latitude!, timestamp, id);
       }
@@ -76,17 +77,18 @@ class _OnGoingState extends State<OnGoing> {
     initId();
   }
 
-  connect() async {
+  connect()  {
     print("connecting");
-    _channel = await IOWebSocketChannel.connect(
+    _channel =  IOWebSocketChannel.connect(
         Uri.parse("ws://20.24.96.85:4242/api/gps-info"),
-        pingInterval: Duration(seconds: 6));
+        pingInterval: Duration(milliseconds: 5000));
     setState(() {
       connected = true;
     });
   }
 
   void checkCon() {
+    print("listening");
     listener = _channel.stream.listen(
       (dynamic message) {
         debugPrint('message $message');
