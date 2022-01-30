@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:bus_side/record_model.dart';
 import 'package:bus_side/view_record.dart';
 import 'package:flutter/material.dart';
-import 'package:html/parser.dart';
 import 'text_block_clickable.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:provider/provider.dart';

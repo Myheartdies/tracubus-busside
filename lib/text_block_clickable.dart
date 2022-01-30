@@ -32,7 +32,7 @@ class _ClickableTextBlockState extends State<ClickableTextBlock> {
         child: Text(
           //Alignment: Alignment.center,
           widget.lineNum,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 50,
             fontWeight: FontWeight.bold,
           ),

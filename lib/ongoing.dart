@@ -29,7 +29,7 @@ class _OnGoingState extends State<OnGoing> {
   String status = "no";
   late WebSocketChannel _channel;
   var listener;
-  Location location = new Location();
+  Location location = Location();
   late bool _serviceEnabled;
   late PermissionStatus _permissionGranted;
   late LocationData _locationData;
@@ -50,6 +50,7 @@ class _OnGoingState extends State<OnGoing> {
     'H': const Color.fromARGB(255, 130, 0, 149),
   };
 
+  @override
   void dispose() {
     _channel.sink.close();
     _timer.cancel();
@@ -59,7 +60,6 @@ class _OnGoingState extends State<OnGoing> {
     super.dispose();
   }
 
-//TODO: implement getting the IMEI and parse it to int
   @override
   void initState() {
     super.initState();
@@ -71,10 +71,9 @@ class _OnGoingState extends State<OnGoing> {
         });
         connect();
       }
-      if (status == "connecting") {
-      }
+      if (status == "connecting") {}
       if (status == "yes") {
-        _SendMessage(widget.lineNum, _locationData.longitude!,
+        _sendMessage(widget.lineNum, _locationData.longitude!,
             _locationData.speed!, _locationData.latitude!, timestamp, id);
       }
     });
@@ -93,13 +92,13 @@ class _OnGoingState extends State<OnGoing> {
   // }
 
   connect() {
-    Random r = new Random();
+    Random r = Random();
     String key = base64.encode(List<int>.generate(8, (_) => r.nextInt(255)));
 
     HttpClient client = HttpClient();
     client
         .getUrl(Uri.parse("http://20.24.96.85:4242/api/gps-info"))
-        .timeout(Duration(seconds: 10))
+        .timeout(const Duration(seconds: 10))
         .then((request) {
       request.headers.add('Connection', 'upgrade');
       request.headers.add('Upgrade', 'websocket');
@@ -110,7 +109,7 @@ class _OnGoingState extends State<OnGoing> {
         response.detachSocket().then((socket) {
           final webSocket =
               WebSocket.fromUpgradedSocket(socket, serverSide: false);
-          webSocket.pingInterval = Duration(milliseconds: 5000);
+          webSocket.pingInterval = const Duration(milliseconds: 5000);
           _channel = IOWebSocketChannel(webSocket);
           checkCon();
           setState(() {
@@ -175,10 +174,8 @@ class _OnGoingState extends State<OnGoing> {
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       var loc = snapshot.data as LocationData;
-                      if (loc != null) {
-                        _locationData = loc;
-                        timestamp = DateTime.now().microsecondsSinceEpoch;
-                      }
+                      _locationData = loc;
+                      timestamp = DateTime.now().microsecondsSinceEpoch;
                       return Container();
                       //  return Text((loc.longitude!+loc.latitude!+loc.speed!).toString());
                     } else {
@@ -199,7 +196,7 @@ class _OnGoingState extends State<OnGoing> {
                   ),
                 ),
               ),
-              Contoured(widget.lineNum),
+              contoured(widget.lineNum),
               Container(
                 padding: const EdgeInsets.all(8.0),
                 alignment: Alignment.center,
@@ -243,7 +240,7 @@ class _OnGoingState extends State<OnGoing> {
     );
   }
 
-  Widget Contoured(String input) {
+  Widget contoured(String input) {
     return Stack(children: [
       Container(
         //padding: EdgeInsets.all(8.0),
@@ -289,10 +286,10 @@ class _OnGoingState extends State<OnGoing> {
   }
 
 //Send json with address message to server
-  void _SendMessage(String route, double longit, double speed, double latit,
-      int time, String Id) {
+  void _sendMessage(String route, double longit, double speed, double latit,
+      int time, String id) {
     // debugPrint(time.toString());
-    print("id" + Id);
+    print("id" + id);
     //int did = int.parse(Id);
     var info = {
       "route": route,
@@ -300,7 +297,7 @@ class _OnGoingState extends State<OnGoing> {
       "speed": speed,
       "latitude": latit,
       "timestamp": time,
-      "id": Id,
+      "id": id,
     };
     Provider.of<RecordModel>(context, listen: false).store(info);
     // debugPrint(info.toString());

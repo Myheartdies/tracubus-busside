@@ -20,16 +20,15 @@ class _ViewRecordState extends State<ViewRecord> {
     return Consumer<RecordModel>(builder: (context, model, child) {
       return Scaffold(
           appBar: AppBar(
-            title: Text("the record is here"),
+            title: const Text("the record is here"),
           ),
-          body: 
-              ListView.builder(
-                  itemCount: (model == null) ? 0 : model.records.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Container(
-                        padding: EdgeInsets.all(4),
-                        child: Text(model.records[index].toString()));
-                  }));
+          body: ListView.builder(
+              itemCount: model.records.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Container(
+                    padding: const EdgeInsets.all(4),
+                    child: Text(model.records[index].toString()));
+              }));
     });
   }
 }
