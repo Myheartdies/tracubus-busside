@@ -1,18 +1,20 @@
 import 'package:flutter/cupertino.dart';
 import 'dart:io';
 
-class RecordModel extends ChangeNotifier{
-  
-  final List<Map> _records=[];
-  void store(Map record){
+class RecordModel extends ChangeNotifier {
+  final List<Map> _records = [];
+  void store(Map record) {
     _records.add(record);
     notifyListeners();
   }
 
-  List view(){
+  List view() {
     print(_records);
     notifyListeners();
     return _records;
   }
-
+  void writeToFile() async{
+    final filename = 'record.txt';
+    var file = await File(filename).writeAsString(_records.toString());
+  }
 }
