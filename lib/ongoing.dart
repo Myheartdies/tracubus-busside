@@ -309,7 +309,10 @@ class _OnGoingState extends State<OnGoing> {
   }
 
   void _sendTrajectory() {
-    var trajectory = Provider.of<RecordModel>(context, listen: false).records;
+    var trajectoryrec = Provider.of<RecordModel>(context, listen: false).records;
+    var trajectory ={
+      "data": trajectoryrec,
+    };
     _channel.sink.add(jsonEncode(trajectory));
   }
 }
