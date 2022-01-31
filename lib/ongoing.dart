@@ -25,10 +25,13 @@ class OnGoing extends StatefulWidget {
 
 class _OnGoingState extends State<OnGoing> {
   String id = '';
-  // bool connected = false;
-  String status = "no";
+  String locStatus = "no";
+  String histStatus = "no";
   late WebSocketChannel _channel;
+  late WebSocketChannel _histChannel;
   var listener;
+  String locUrl = "http://20.24.96.85:4242/api/gps-info";
+  String histUrl = "http://20.24.96.85:4242/api/history";
   Location location = Location();
   late bool _serviceEnabled;
   late PermissionStatus _permissionGranted;
@@ -52,8 +55,11 @@ class _OnGoingState extends State<OnGoing> {
 
   @override
   void dispose() {
-    if (status == "yes") {
+    if (locStatus == "yes") {
       _channel.sink.close();
+    }
+    if (histStatus == "yes") {
+      _histChannel.sink.close();
     }
     _timer.cancel();
     if (listener != null) {
@@ -67,43 +73,52 @@ class _OnGoingState extends State<OnGoing> {
     super.initState();
     id = widget.id;
     setState(() {
-      status = "connecting";
+      locStatus = "connecting";
+      histStatus = "connecting";
     });
-    connect();
+    connect(locUrl);
+    connectHist(histUrl);
     _timer = Timer.periodic(const Duration(milliseconds: 1300), (timer) {
-      if (status == "no") {
-        setState(() {
-          status = "connecting";
-        });
-        connect();
-      }
-      if (status == "connecting") {}
-      if (status == "yes") {
-        _sendMessage(widget.lineNum, _locationData.longitude!,
-            _locationData.speed!, _locationData.latitude!, timestamp, id);
-      }
+      manLocChan();
+      manHistChan();
     });
     initId();
   }
 
-  // connect() {
-  //   print("connecting");
-  //  _channel = IOWebSocketChannel.connect(
-  //       Uri.parse("ws://20.24.96.85:4242/api/gps-info"),
-  //       //   Uri.parse("ws://12.251.160.105:4242/api/gps-info"),
-  //       pingInterval: Duration(milliseconds: 5000));
-  //   setState(() {
-  //     connected = true;
-  //   });
-  // }
+  void manLocChan() {
+    if (locStatus == "no") {
+      setState(() {
+        locStatus = "connecting";
+      });
+      connect(locUrl);
+    }
+    if (locStatus == "connecting") {}
+    if (locStatus == "yes") {
+      _sendMessage(widget.lineNum, _locationData.longitude!,
+          _locationData.speed!, _locationData.latitude!, timestamp, id);
+    }
+  }
 
-  void connect() {
+  void manHistChan() {
+    if (histStatus == "no") {
+      setState(() {
+        histStatus = "connecting";
+      });
+      connectHist(histUrl);
+    }
+    if (histStatus == "connecting") {
+      print("history connecting");
+    }
+    if (histStatus == "yes") {}
+  }
+
+  void connect(String url) {
     Random r = Random();
     String key = base64.encode(List<int>.generate(8, (_) => r.nextInt(255)));
 
     HttpClient client = HttpClient();
     client
-        .getUrl(Uri.parse("http://20.24.96.85:4242/api/gps-info"))
+        .getUrl(Uri.parse(url))
         .timeout(const Duration(seconds: 10))
         .then((request) {
       request.headers.add('Connection', 'upgrade');
@@ -119,14 +134,49 @@ class _OnGoingState extends State<OnGoing> {
           _channel = IOWebSocketChannel(webSocket);
           checkCon();
           setState(() {
-            status = "yes";
+            locStatus = "yes";
           });
         });
       });
     }).catchError((error) {
       print(error);
       setState(() {
-        status = "no";
+        locStatus = "no";
+      });
+      return;
+    });
+  }
+
+  void connectHist(String url) {
+    Random r = Random();
+    String key = base64.encode(List<int>.generate(8, (_) => r.nextInt(255)));
+
+    HttpClient client = HttpClient();
+    client
+        .getUrl(Uri.parse(url))
+        .timeout(const Duration(seconds: 10))
+        .then((request) {
+      request.headers.add('Connection', 'upgrade');
+      request.headers.add('Upgrade', 'websocket');
+      request.headers.add('sec-websocket-version', '13');
+      request.headers.add('sec-websocket-key', key);
+
+      request.close().then((response) {
+        response.detachSocket().then((socket) {
+          final webSocket =
+              WebSocket.fromUpgradedSocket(socket, serverSide: false);
+          webSocket.pingInterval = const Duration(milliseconds: 5000);
+          _histChannel = IOWebSocketChannel(webSocket);
+          checkConHist();
+          setState(() {
+            histStatus = "yes";
+          });
+        });
+      });
+    }).catchError((error) {
+      print(error);
+      setState(() {
+        histStatus = "no";
       });
       return;
     });
@@ -142,18 +192,42 @@ class _OnGoingState extends State<OnGoing> {
         print('ws channel closed');
         // print("connection closed abnormally, need reconnection");
         setState(() {
-          status = "no";
+          locStatus = "no";
         });
       },
       onError: (error) {
         debugPrint(timestamp.toString());
         print('ws error $error');
         setState(() {
-          status = "no";
+          locStatus = "no";
         });
       },
     );
   }
+
+   void checkConHist() {
+    print("history listening");
+    listener = _histChannel.stream.listen(
+      (dynamic message) {
+        debugPrint('message $message');
+      },
+      onDone: () {
+        print('history ws channel closed');
+        // print("connection closed abnormally, need reconnection");
+        setState(() {
+          histStatus = "no";
+        });
+      },
+      onError: (error) {
+        debugPrint(timestamp.toString());
+        print('history ws error $error');
+        setState(() {
+          histStatus = "no";
+        });
+      },
+    );
+  }
+
 
   Future<void> initId() async {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
@@ -236,7 +310,7 @@ class _OnGoingState extends State<OnGoing> {
                   ),
                 ),
                 onPressed: () {
-                  if (status == "yes") {
+                  if (histStatus == "yes") {
                     _sendTrajectory();
                   }
                   Navigator.pop(context);
@@ -316,8 +390,8 @@ class _OnGoingState extends State<OnGoing> {
     var trajectoryrec =
         Provider.of<RecordModel>(context, listen: false).records;
     var trajectory = {
-      "data": trajectoryrec,
+      "trajectory": trajectoryrec,
     };
-    _channel.sink.add(jsonEncode(trajectory));
+    _histChannel.sink.add(jsonEncode(trajectory));
   }
 }
