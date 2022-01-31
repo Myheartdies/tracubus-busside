@@ -91,7 +91,7 @@ class _OnGoingState extends State<OnGoing> {
   //   });
   // }
 
-  connect() {
+  void connect() {
     Random r = Random();
     String key = base64.encode(List<int>.generate(8, (_) => r.nextInt(255)));
 
@@ -122,7 +122,7 @@ class _OnGoingState extends State<OnGoing> {
       setState(() {
         status = "no";
       });
-      return null;
+      return;
     });
   }
 
@@ -133,15 +133,15 @@ class _OnGoingState extends State<OnGoing> {
         debugPrint('message $message');
       },
       onDone: () {
-        debugPrint('ws channel closed');
+        print('ws channel closed');
         // print("connection closed abnormally, need reconnection");
         setState(() {
           status = "no";
         });
       },
       onError: (error) {
-        print(timestamp);
-        debugPrint('ws error $error');
+        debugPrint(timestamp.toString());
+        print('ws error $error');
         setState(() {
           status = "no";
         });
@@ -230,6 +230,7 @@ class _OnGoingState extends State<OnGoing> {
                   ),
                 ),
                 onPressed: () {
+                  _sendTrajectory();
                   Navigator.pop(context);
                 },
               ),
@@ -289,7 +290,7 @@ class _OnGoingState extends State<OnGoing> {
   void _sendMessage(String route, double longit, double speed, double latit,
       int time, String id) {
     // debugPrint(time.toString());
-    print("id" + id);
+    debugPrint("id" + id);
     //int did = int.parse(Id);
     var info = {
       "route": route,
@@ -300,7 +301,11 @@ class _OnGoingState extends State<OnGoing> {
       "id": id,
     };
     Provider.of<RecordModel>(context, listen: false).store(info);
-    // debugPrint(info.toString());
     _channel.sink.add(jsonEncode(info));
   }
+  void _sendTrajectory(){
+    var trajectory=Provider.of<RecordModel>(context, listen: false).records;
+     _channel.sink.add(jsonEncode(trajectory));
+  }
 }
+
