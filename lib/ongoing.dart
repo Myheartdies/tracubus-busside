@@ -52,7 +52,9 @@ class _OnGoingState extends State<OnGoing> {
 
   @override
   void dispose() {
-    _channel.sink.close();
+    if (status == "yes") {
+      _channel.sink.close();
+    }
     _timer.cancel();
     if (listener != null) {
       listener.cancel();
@@ -86,7 +88,7 @@ class _OnGoingState extends State<OnGoing> {
 
   // connect() {
   //   print("connecting");
-  //   _channel = IOWebSocketChannel.connect(
+  //  _channel = IOWebSocketChannel.connect(
   //       Uri.parse("ws://20.24.96.85:4242/api/gps-info"),
   //       //   Uri.parse("ws://12.251.160.105:4242/api/gps-info"),
   //       pingInterval: Duration(milliseconds: 5000));
@@ -234,7 +236,9 @@ class _OnGoingState extends State<OnGoing> {
                   ),
                 ),
                 onPressed: () {
-                  _sendTrajectory();
+                  if (status == "yes") {
+                    _sendTrajectory();
+                  }
                   Navigator.pop(context);
                 },
               ),
@@ -309,8 +313,9 @@ class _OnGoingState extends State<OnGoing> {
   }
 
   void _sendTrajectory() {
-    var trajectoryrec = Provider.of<RecordModel>(context, listen: false).records;
-    var trajectory ={
+    var trajectoryrec =
+        Provider.of<RecordModel>(context, listen: false).records;
+    var trajectory = {
       "data": trajectoryrec,
     };
     _channel.sink.add(jsonEncode(trajectory));
