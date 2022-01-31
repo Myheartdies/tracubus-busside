@@ -25,13 +25,10 @@ class OnGoing extends StatefulWidget {
 
 class _OnGoingState extends State<OnGoing> {
   String id = '';
-  String locStatus = "no";
-  String histStatus = "no";
+  String status = "no";
   late WebSocketChannel _channel;
-  late WebSocketChannel _histChannel;
   var listener;
-  String locUrl = "http://20.24.96.85:4242/api/gps-info";
-  String histUrl = "http://20.24.96.85:4242/api/history";
+  String Url = "http://20.24.96.85:4242/api/gps-info";
   Location location = Location();
   late bool _serviceEnabled;
   late PermissionStatus _permissionGranted;
@@ -55,11 +52,8 @@ class _OnGoingState extends State<OnGoing> {
 
   @override
   void dispose() {
-    if (locStatus == "yes") {
+    if (status == "yes") {
       _channel.sink.close();
-    }
-    if (histStatus == "yes") {
-      _histChannel.sink.close();
     }
     _timer.cancel();
     if (listener != null) {
@@ -73,43 +67,23 @@ class _OnGoingState extends State<OnGoing> {
     super.initState();
     id = widget.id;
     setState(() {
-      locStatus = "connecting";
-      histStatus = "connecting";
+      status = "connecting";
     });
-    connect(locUrl);
-    connectHist(histUrl);
+    connect(Url);
     _timer = Timer.periodic(const Duration(milliseconds: 1300), (timer) {
-      manLocChan();
-      manHistChan();
+      if (status == "no") {
+        setState(() {
+          status = "connecting";
+        });
+        connect(Url);
+      }
+      if (status == "connecting") {}
+      if (status == "yes") {
+        _sendMessage(widget.lineNum, _locationData.longitude!,
+            _locationData.speed!, _locationData.latitude!, timestamp, id);
+      }
     });
     initId();
-  }
-
-  void manLocChan() {
-    if (locStatus == "no") {
-      setState(() {
-        locStatus = "connecting";
-      });
-      connect(locUrl);
-    }
-    if (locStatus == "connecting") {}
-    if (locStatus == "yes") {
-      _sendMessage(widget.lineNum, _locationData.longitude!,
-          _locationData.speed!, _locationData.latitude!, timestamp, id);
-    }
-  }
-
-  void manHistChan() {
-    if (histStatus == "no") {
-      setState(() {
-        histStatus = "connecting";
-      });
-      connectHist(histUrl);
-    }
-    if (histStatus == "connecting") {
-      print("history connecting");
-    }
-    if (histStatus == "yes") {}
   }
 
   void connect(String url) {
@@ -134,49 +108,14 @@ class _OnGoingState extends State<OnGoing> {
           _channel = IOWebSocketChannel(webSocket);
           checkCon();
           setState(() {
-            locStatus = "yes";
+            status = "yes";
           });
         });
       });
     }).catchError((error) {
       print(error);
       setState(() {
-        locStatus = "no";
-      });
-      return;
-    });
-  }
-
-  void connectHist(String url) {
-    Random r = Random();
-    String key = base64.encode(List<int>.generate(8, (_) => r.nextInt(255)));
-
-    HttpClient client = HttpClient();
-    client
-        .getUrl(Uri.parse(url))
-        .timeout(const Duration(seconds: 10))
-        .then((request) {
-      request.headers.add('Connection', 'upgrade');
-      request.headers.add('Upgrade', 'websocket');
-      request.headers.add('sec-websocket-version', '13');
-      request.headers.add('sec-websocket-key', key);
-
-      request.close().then((response) {
-        response.detachSocket().then((socket) {
-          final webSocket =
-              WebSocket.fromUpgradedSocket(socket, serverSide: false);
-          webSocket.pingInterval = const Duration(milliseconds: 5000);
-          _histChannel = IOWebSocketChannel(webSocket);
-          checkConHist();
-          setState(() {
-            histStatus = "yes";
-          });
-        });
-      });
-    }).catchError((error) {
-      print(error);
-      setState(() {
-        histStatus = "no";
+        status = "no";
       });
       return;
     });
@@ -192,42 +131,18 @@ class _OnGoingState extends State<OnGoing> {
         print('ws channel closed');
         // print("connection closed abnormally, need reconnection");
         setState(() {
-          locStatus = "no";
+          status = "no";
         });
       },
       onError: (error) {
         debugPrint(timestamp.toString());
         print('ws error $error');
         setState(() {
-          locStatus = "no";
+          status = "no";
         });
       },
     );
   }
-
-   void checkConHist() {
-    print("history listening");
-    listener = _histChannel.stream.listen(
-      (dynamic message) {
-        debugPrint('message $message');
-      },
-      onDone: () {
-        print('history ws channel closed');
-        // print("connection closed abnormally, need reconnection");
-        setState(() {
-          histStatus = "no";
-        });
-      },
-      onError: (error) {
-        debugPrint(timestamp.toString());
-        print('history ws error $error');
-        setState(() {
-          histStatus = "no";
-        });
-      },
-    );
-  }
-
 
   Future<void> initId() async {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
@@ -310,9 +225,7 @@ class _OnGoingState extends State<OnGoing> {
                   ),
                 ),
                 onPressed: () {
-                  if (histStatus == "yes") {
-                    _sendTrajectory();
-                  }
+                  _sendTrajectory();
                   Navigator.pop(context);
                 },
               ),
@@ -392,6 +305,7 @@ class _OnGoingState extends State<OnGoing> {
     var trajectory = {
       "trajectory": trajectoryrec,
     };
-    _histChannel.sink.add(jsonEncode(trajectory));
+    //TODO: Send the history with a post request
+    // _histChannel.sink.add(jsonEncode(trajectory));
   }
 }
