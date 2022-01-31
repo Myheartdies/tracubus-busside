@@ -64,6 +64,10 @@ class _OnGoingState extends State<OnGoing> {
   void initState() {
     super.initState();
     id = widget.id;
+    setState(() {
+      status = "connecting";
+    });
+    connect();
     _timer = Timer.periodic(const Duration(milliseconds: 1300), (timer) {
       if (status == "no") {
         setState(() {
@@ -303,9 +307,9 @@ class _OnGoingState extends State<OnGoing> {
     Provider.of<RecordModel>(context, listen: false).store(info);
     _channel.sink.add(jsonEncode(info));
   }
-  void _sendTrajectory(){
-    var trajectory=Provider.of<RecordModel>(context, listen: false).records;
-     _channel.sink.add(jsonEncode(trajectory));
+
+  void _sendTrajectory() {
+    var trajectory = Provider.of<RecordModel>(context, listen: false).records;
+    _channel.sink.add(jsonEncode(trajectory));
   }
 }
-
