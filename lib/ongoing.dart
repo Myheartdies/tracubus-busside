@@ -7,6 +7,7 @@ import 'package:bus_side/record_model.dart';
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/io.dart';
 import "package:web_socket_channel/web_socket_channel.dart";
+import 'package:http/http.dart' as http;
 // import 'package:web_socket_channel/status.dart' as status;
 
 import 'package:location/location.dart';
@@ -225,8 +226,7 @@ class _OnGoingState extends State<OnGoing> {
                   ),
                 ),
                 onPressed: () {
-                  _sendTrajectory();
-                  Navigator.pop(context);
+                  handleClose();                  
                 },
               ),
             ],
@@ -299,13 +299,21 @@ class _OnGoingState extends State<OnGoing> {
     _channel.sink.add(jsonEncode(info));
   }
 
-  void _sendTrajectory() {
+  void _sendTrajectory() async {
+    //TODO: Handle the situation of not sending succesfully
+    var sendUri = Uri.parse("http://20.24.96.85:4242/api/history");
     var trajectoryrec =
         Provider.of<RecordModel>(context, listen: false).records;
     var trajectory = {
       "trajectory": trajectoryrec,
     };
-    //TODO: Send the history with a post request
-    // _histChannel.sink.add(jsonEncode(trajectory));
+    var response = await http.post(sendUri, body: trajectory);
+    print('Response status: ${response.statusCode}');
+    print('Response body: ${response.body}');
+  }
+
+  void handleClose() async{
+     _sendTrajectory();
+     Navigator.pop(context);
   }
 }
