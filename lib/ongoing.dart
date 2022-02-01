@@ -29,13 +29,14 @@ class _OnGoingState extends State<OnGoing> {
   String status = "no";
   late WebSocketChannel _channel;
   var listener;
-  String Url = "http://20.24.96.85:4242/api/gps-info";
+  String uri = "http://20.24.96.85:4242/api/gps-info";
   Location location = Location();
   late bool _serviceEnabled;
   late PermissionStatus _permissionGranted;
   late LocationData _locationData;
   late int timestamp;
   late Timer _timer;
+  bool _clicked = false;
   var colormap = {
     '1A': const Color.fromARGB(255, 225, 221, 52),
     '1B': const Color.fromARGB(255, 225, 221, 52),
@@ -70,13 +71,13 @@ class _OnGoingState extends State<OnGoing> {
     setState(() {
       status = "connecting";
     });
-    connect(Url);
+    connect(uri);
     _timer = Timer.periodic(const Duration(milliseconds: 1300), (timer) {
       if (status == "no") {
         setState(() {
           status = "connecting";
         });
-        connect(Url);
+        connect(uri);
       }
       if (status == "connecting") {}
       if (status == "yes") {
@@ -226,7 +227,7 @@ class _OnGoingState extends State<OnGoing> {
                   ),
                 ),
                 onPressed: () {
-                  handleClose();                  
+                  handleClose();
                 },
               ),
             ],
@@ -307,13 +308,19 @@ class _OnGoingState extends State<OnGoing> {
     var trajectory = {
       "trajectory": trajectoryrec,
     };
-    var response = await http.post(sendUri, body: trajectory);
+    var response = await http.post(sendUri, body: jsonEncode(trajectory));
     print('Response status: ${response.statusCode}');
     print('Response body: ${response.body}');
   }
 
-  void handleClose() async{
-     _sendTrajectory();
-     Navigator.pop(context);
+  void handleClose() async {
+    if (!_clicked) {
+      setState(() {
+        _clicked = true;
+      });
+      print("clicked on button");
+      _sendTrajectory();
+      Navigator.pop(context);
+    }
   }
 }
