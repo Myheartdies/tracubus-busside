@@ -14,6 +14,8 @@ import 'package:location/location.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:provider/provider.dart';
 
+import 'stop_resolver.dart';
+
 class OnGoing extends StatefulWidget {
   final String lineNum;
   final String id;
@@ -25,6 +27,7 @@ class OnGoing extends StatefulWidget {
 }
 
 class _OnGoingState extends State<OnGoing> {
+  late StopResolver resolver;
   String id = '';
   String status = "no";
   late WebSocketChannel _channel;
@@ -36,6 +39,7 @@ class _OnGoingState extends State<OnGoing> {
   late LocationData _locationData;
   late int timestamp;
   late Timer _timer;
+  int currentStop = 0;
   bool _clicked = false;
   var colormap = {
     '1A': const Color.fromARGB(255, 225, 221, 52),
@@ -70,9 +74,12 @@ class _OnGoingState extends State<OnGoing> {
     id = widget.id;
     setState(() {
       status = "connecting";
+      resolver=Provider.of(context,listen: false).GetResolver(widget.lineNum);
     });
+    
     connect(uri);
     _timer = Timer.periodic(const Duration(milliseconds: 1300), (timer) {
+      currentStop=resolver.resolve(_locationData.latitude!, _locationData.longitude!);
       if (status == "no") {
         setState(() {
           status = "connecting";
@@ -81,8 +88,14 @@ class _OnGoingState extends State<OnGoing> {
       }
       if (status == "connecting") {}
       if (status == "yes") {
-        _sendMessage(widget.lineNum, _locationData.longitude!,
-            _locationData.speed!, _locationData.latitude!, timestamp, id);
+        _sendMessage(
+            widget.lineNum,
+            _locationData.longitude!,
+            _locationData.speed!,
+            _locationData.latitude!,
+            timestamp,
+            id,
+            currentStop);
       }
     });
     initId();
@@ -170,11 +183,12 @@ class _OnGoingState extends State<OnGoing> {
                   stream: location.onLocationChanged,
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
+                      //resolver.resolve(currentLati, currentLongi)
                       var loc = snapshot.data as LocationData;
                       _locationData = loc;
+                     // resolver.resolve(_locationData.latitude!, _locationData.longitude!)
                       timestamp = DateTime.now().microsecondsSinceEpoch;
                       return Container();
-                      //  return Text((loc.longitude!+loc.latitude!+loc.speed!).toString());
                     } else {
                       return Container();
                     }
@@ -284,8 +298,9 @@ class _OnGoingState extends State<OnGoing> {
 
 //Send json with address message to server
   void _sendMessage(String route, double longit, double speed, double latit,
-      int time, String id) {
-    // debugPrint(time.toString());
+      int time, String id, int stop) {
+    debugPrint(longit.toString());
+    debugPrint(latit.toString());
     debugPrint("id" + id);
     //int did = int.parse(Id);
     var info = {
@@ -295,6 +310,7 @@ class _OnGoingState extends State<OnGoing> {
       "latitude": latit,
       "timestamp": time,
       "id": id,
+      "stop": stop,
     };
     Provider.of<RecordModel>(context, listen: false).store(info);
     _channel.sink.add(jsonEncode(info));

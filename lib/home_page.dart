@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:bus_side/record_model.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'text_block_clickable.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key, required this.title}) : super(key: key);
@@ -44,7 +46,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
+    
     super.initState();
+    fetchInfo();
     initId();
   }
 
@@ -57,6 +61,22 @@ class _MyHomePageState extends State<MyHomePage> {
       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
       id = iosInfo.identifierForVendor!;
     }
+  }
+
+  Future<void> fetchInfo() async{
+    var data;
+    try{
+      var response=await http.get(Uri.parse("http://20.24.96.85:4242/api/routes.json"));
+      data=jsonDecode(response.body) as Map<String,dynamic>;
+      print(response.statusCode);
+      print(data["stops"]);
+      Provider.of(context,listen: false).convertInfo(data);
+      //TODO: Implement a way to await the finish of converting before entering onGoing page
+    }
+    catch(e){
+      print(e);
+    }
+
   }
 
   Widget expandedRow(List<String> line) {
