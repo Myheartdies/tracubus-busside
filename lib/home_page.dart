@@ -46,10 +46,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
-    
     super.initState();
-    fetchInfo();
     initId();
+    fetchInfo();
   }
 
   Future<void> initId() async {
@@ -63,20 +62,21 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Future<void> fetchInfo() async{
-    var data;
-    try{
-      var response=await http.get(Uri.parse("http://20.24.96.85:4242/api/routes.json"));
-      data=jsonDecode(response.body) as Map<String,dynamic>;
-      print(response.statusCode);
-      print(data["stops"]);
-      Provider.of(context,listen: false).convertInfo(data);
-      //TODO: Implement a way to await the finish of converting before entering onGoing page
+  Future<void> fetchInfo() async {
+    if (!Provider.of<RecordModel>(context, listen: false).Finished) {
+      var data;
+      try {
+        var response = await http
+            .get(Uri.parse("http://20.24.96.85:4242/api/routes.json"));
+        data = jsonDecode(response.body) as Map<String, dynamic>;
+        print(response.statusCode);
+        print(data["routes"]);
+        Provider.of<RecordModel>(context, listen: false).convertInfo(data);
+        //TODO: Implement a way to await the finish of converting before entering onGoing page
+      } catch (e) {
+        print(e);
+      }
     }
-    catch(e){
-      print(e);
-    }
-
   }
 
   Widget expandedRow(List<String> line) {

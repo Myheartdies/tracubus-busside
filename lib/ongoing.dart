@@ -74,12 +74,14 @@ class _OnGoingState extends State<OnGoing> {
     id = widget.id;
     setState(() {
       status = "connecting";
-      resolver=Provider.of(context,listen: false).GetResolver(widget.lineNum);
+      resolver = Provider.of<RecordModel>(context, listen: false)
+          .GetResolver(widget.lineNum);
     });
-    
+
     connect(uri);
     _timer = Timer.periodic(const Duration(milliseconds: 1300), (timer) {
-      currentStop=resolver.resolve(_locationData.latitude!, _locationData.longitude!);
+      currentStop =
+          resolver.resolve(_locationData.latitude!, _locationData.longitude!);
       if (status == "no") {
         setState(() {
           status = "connecting";
@@ -186,7 +188,7 @@ class _OnGoingState extends State<OnGoing> {
                       //resolver.resolve(currentLati, currentLongi)
                       var loc = snapshot.data as LocationData;
                       _locationData = loc;
-                     // resolver.resolve(_locationData.latitude!, _locationData.longitude!)
+                      // resolver.resolve(_locationData.latitude!, _locationData.longitude!)
                       timestamp = DateTime.now().microsecondsSinceEpoch;
                       return Container();
                     } else {
@@ -301,8 +303,7 @@ class _OnGoingState extends State<OnGoing> {
       int time, String id, int stop) {
     debugPrint(longit.toString());
     debugPrint(latit.toString());
-    debugPrint("id" + id);
-    //int did = int.parse(Id);
+    debugPrint("id " + id);
     var info = {
       "route": route,
       "longitude": longit,
@@ -312,6 +313,7 @@ class _OnGoingState extends State<OnGoing> {
       "id": id,
       "stop": stop,
     };
+    debugPrint(info.toString());
     Provider.of<RecordModel>(context, listen: false).store(info);
     _channel.sink.add(jsonEncode(info));
   }
@@ -325,8 +327,7 @@ class _OnGoingState extends State<OnGoing> {
       "trajectory": trajectoryrec,
     };
     var response = await http.post(sendUri, body: jsonEncode(trajectory));
-    print('Response status: ${response.statusCode}');
-    print('Response body: ${response.body}');
+    debugPrint('History sent, \nResponse status: ${response.statusCode}');
   }
 
   void handleClose() async {

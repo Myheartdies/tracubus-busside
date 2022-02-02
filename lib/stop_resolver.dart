@@ -1,23 +1,21 @@
-import 'dart:html';
-
 import 'package:provider/provider.dart';
 import 'record_model.dart';
 import 'dart:math';
 import 'package:http/http.dart' as http;
 
-
-
 class StopResolver {
-  bool isValid=true;
-  void addStop(point input){
+  bool isValid = true;
+  void addStop(point input) {
     _stops.add(input);
   }
-  void addJp(point input){
+
+  void addJp(point input) {
     _jumpPoints.add(input);
   }
- 
-  List<point> _stops=[]; //This is all stops of one bus route
-  List<point> _jumpPoints=[];  //This is all jumppoints of stops of one bus route
+
+  List<point> _stops = []; //This is all stops of one bus route
+  List<point> _jumpPoints =
+      []; //This is all jumppoints of stops of one bus route
   List<bool> detecting = []; //TODO: initialize the detecting values
   bool isInOrder = true;
   int closest = 0;
@@ -67,6 +65,7 @@ class StopResolver {
 
     return -1;
   }
+
   int findClosest(
       point currentPoint, List<point> chosenStops, double maxviable) {
     //expects stops to be a list of list of two doubles which indicates Latitude and Longitude
@@ -96,10 +95,9 @@ class StopResolver {
   reachStop() {}
 }
 
-class EmptyResolver extends StopResolver{
+class EmptyResolver extends StopResolver {
   @override
   int resolve(double currentLati, double currentLongi) {
-    // TODO: implement resolve
     print("Not enough information for Stop reslover, the resolver is empty");
     return -1;
   }

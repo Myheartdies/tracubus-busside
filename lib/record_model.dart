@@ -17,6 +17,7 @@ class point {
 
 //This provider now provide status management for both storing history and resloving stop
 class RecordModel extends ChangeNotifier {
+  bool preparationFinished = false;
   final List<Map> _records = [];
   final Map<String, point> _stops = {};
   final List<point> _jumpPoints = [];
@@ -25,12 +26,13 @@ class RecordModel extends ChangeNotifier {
   List<Map> get records => _records;
   Map<String, point> get stops => _stops;
   List<point> get jumpoints => _jumpPoints;
+  bool get Finished => preparationFinished;
   StopResolver GetResolver(String route) {
     try {
       if (_ResolverPile.containsKey(route)) {
         return _ResolverPile[route]!;
-      }
-      else return EmptyResolver();
+      } else
+        return EmptyResolver();
     } catch (e) {
       print(e);
       return EmptyResolver();
@@ -42,7 +44,7 @@ class RecordModel extends ChangeNotifier {
     //a pile of StopResolver that is mapped to each route
 
     BusInfo busInfo = BusInfo.fromJson(data);
-    
+
     busInfo.points.forEach((element) {
       points.add(point(element[0], element[1])); //get value of points
     });
@@ -57,6 +59,8 @@ class RecordModel extends ChangeNotifier {
         _ResolverPile[routename]!.addJp(points[stopInfo.jump]);
       });
     });
+    preparationFinished = true;
+    notifyListeners();
   }
 
   void store(Map record) {
