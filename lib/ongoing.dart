@@ -32,7 +32,7 @@ class _OnGoingState extends State<OnGoing> {
   String status = "no";
   late WebSocketChannel _channel;
   var listener;
-  String uri = "http://20.24.96.85:4242/api/gps-info";
+  String uri = "http://20.24.87.7:4242/api/gps-info";
   Location location = Location();
   late bool _serviceEnabled;
   late PermissionStatus _permissionGranted;
