@@ -25,7 +25,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("选择你的路线"),
+          title: const Text("選擇你的路線"),
           //The button here is for debug purpose
           leading: recordButton(), //TODO: Remove it when release
         ),

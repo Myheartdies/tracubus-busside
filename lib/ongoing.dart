@@ -79,7 +79,7 @@ class _OnGoingState extends State<OnGoing> {
     });
 
     connect(uri);
-    _timer = Timer.periodic(const Duration(milliseconds: 1300), (timer) {
+    _timer = Timer.periodic(const Duration(milliseconds: 1100), (timer) {
       currentStop =
           resolver.resolve(_locationData.latitude!, _locationData.longitude!);
       if (status == "no") {
@@ -200,7 +200,7 @@ class _OnGoingState extends State<OnGoing> {
                 alignment: Alignment.center,
                 child: const Text(
                   '''
-您的当前路线是
+您的當前路線是
 ''',
                   textAlign: TextAlign.center,
                   style: TextStyle(
@@ -215,8 +215,9 @@ class _OnGoingState extends State<OnGoing> {
                 alignment: Alignment.center,
                 child: const Text(
                   '''
-若路线切换，点按“切换路线”按钮
-回到路线选择页面
+若路線切換或者您已到達終點，
+點按“返回主頁”按鈕
+以回到主页重新选取路线
 ''',
                   textAlign: TextAlign.center,
                   style: TextStyle(
@@ -236,7 +237,7 @@ class _OnGoingState extends State<OnGoing> {
                 ),
                 icon: const Icon(Icons.directions_bus, size: 50),
                 label: const Text(
-                  "切换路线",
+                  "返回主頁",
                   style: TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.bold,

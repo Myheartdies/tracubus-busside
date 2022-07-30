@@ -35,7 +35,7 @@ class StopResolver {
 
   int resolve(double currentLati, double currentLongi) {
     var currentp = point(currentLati, currentLongi);
-    int closest = findClosest(currentp, _stops + _jumpPoints, 0.000000001);
+    int closest = findClosest(currentp, _stops + _jumpPoints, 0.0000000001);
     if (closest >= _stops.length) {
       if (!detecting[closest - _stops.length]) {
         return current;
