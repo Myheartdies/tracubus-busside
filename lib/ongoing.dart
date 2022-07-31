@@ -321,7 +321,7 @@ class _OnGoingState extends State<OnGoing> {
 
   void _sendTrajectory() async {
     //TODO: Handle the situation of not sending succesfully
-    var sendUri = Uri.parse("http://20.24.96.85:4242/api/history");
+    var sendUri = Uri.parse("http://20.24.87.7:4242/api/history");
     var trajectoryrec =
         Provider.of<RecordModel>(context, listen: false).records;
     var trajectory = {
