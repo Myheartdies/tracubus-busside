@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'ongoing.dart';
 
 class ClickableTextBlock extends StatefulWidget {
-  final String lineNum;
+  final String lineNum; //School bus line number
   final String id;
 
   const ClickableTextBlock({Key? key, required this.lineNum, required this.id})
