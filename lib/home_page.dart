@@ -67,7 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
       var data;
       try {
         var response = await http
-            .get(Uri.parse("http://20.24.96.85:4242/api/routes.json"));
+            .get(Uri.parse("http://20.24.87.7:4242/api/routes.json"));
         data = jsonDecode(response.body) as Map<String, dynamic>;
         print(response.statusCode);
         print(data["routes"]);
