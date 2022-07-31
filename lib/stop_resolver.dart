@@ -7,10 +7,12 @@ class StopResolver {
   bool isValid = true;
   void addStop(point input) {
     _stops.add(input);
+    detecting.add(false);
   }
 
   void addJp(point input) {
     _jumpPoints.add(input);
+    detecting.add(false);
   }
 
   List<point> _stops = []; //This is all stops of one bus route
@@ -36,7 +38,7 @@ class StopResolver {
   int resolve(double currentLati, double currentLongi) {
     var currentp = point(currentLati, currentLongi);
     int closest = findClosest(currentp, _stops + _jumpPoints, 0.0000000001);
-    if (closest >= _stops.length) {
+    if (closest >= _stops.length) {//if the bus is closes to a jump point
       if (!detecting[closest - _stops.length]) {
         return current;
       }
@@ -45,18 +47,18 @@ class StopResolver {
       }
       current = closest - _stops.length;
       return current;
-    } else if (closest > -1) {
-      if (closest == current + 1) {
+    } else if (closest > -1) {// if the bus is closest to a stop check status:
+      if (closest == current + 1) {//if this is the natural next stop, change current stop
         current = closest;
         for (int i = 0; i < detecting.length; i++) {
-          detecting[i] = false;
+          detecting[i] = false;//clear detecting list
         }
         return current;
       }
-      if (closest <= current) {
+      if (closest <= current) { // if this is a stop already arrived before, ignore
         return current;
       }
-      detecting[closest] = true;
+      detecting[closest] = true;// if it is none of the above, add the 
       return current;
     } else if (closest == -1) {
       return current;
