@@ -38,16 +38,16 @@ class StopResolver {
   int resolve(double currentLati, double currentLongi) {
     var currentp = point(currentLati, currentLongi);
     int closest = findClosest(currentp, _stops + _jumpPoints, 0.0000000001);
-    if (closest >= _stops.length) {//if the bus is closes to a jump point
-      if (!detecting[closest - _stops.length]) {
+    if (closest >= _stops.length) {//if the bus is closest to a jump point
+      if (!detecting[closest - _stops.length]) {//if the jumppoint is not on detecting, ignore
         return current;
       }
-      for (int i = 0; i < detecting.length; i++) {
+      for (int i = 0; i < detecting.length; i++) {//(else is not needed here) else, reset detecting values,
         detecting[i] = false;
       }
-      current = closest - _stops.length;
+      current = closest - _stops.length;// and set the new current to the stop correlating to the jump point
       return current;
-    } else if (closest > -1) {// if the bus is closest to a stop check status:
+    } else if (closest > -1) {// if the bus is closest to a stop, check status:
       if (closest == current + 1) {//if this is the natural next stop, change current stop
         current = closest;
         for (int i = 0; i < detecting.length; i++) {
@@ -58,7 +58,7 @@ class StopResolver {
       if (closest <= current) { // if this is a stop already arrived before, ignore
         return current;
       }
-      detecting[closest] = true;// if it is none of the above, add the 
+      detecting[closest] = true;// if it is none of the above, add the closest stop to detecting list
       return current;
     } else if (closest == -1) {
       return current;
