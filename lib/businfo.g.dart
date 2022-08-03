@@ -9,11 +9,9 @@ part of 'businfo.dart';
 BusRoute _$BusRouteFromJson(Map<String, dynamic> json) {
   $checkKeys(
     json,
-    requiredKeys: const ['name', 'info', 'pieces'],
+    requiredKeys: const ['pieces'],
   );
   return BusRoute(
-    json['name'] as String,
-    json['info'] as String,
     (json['pieces'] as List<dynamic>)
         .map((e) => StopInRoute.fromJson(e as Map<String, dynamic>))
         .toList(),
@@ -21,8 +19,6 @@ BusRoute _$BusRouteFromJson(Map<String, dynamic> json) {
 }
 
 Map<String, dynamic> _$BusRouteToJson(BusRoute instance) => <String, dynamic>{
-      'name': instance.name,
-      'info': instance.info,
       'pieces': instance.pieces,
     };
 
