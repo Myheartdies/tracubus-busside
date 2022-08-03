@@ -4,13 +4,7 @@ part 'businfo.g.dart';
 
 @JsonSerializable()
 class BusRoute {
-  BusRoute(this.name, this.info, this.pieces);
-
-  @JsonKey(required: true)
-  final String name;
-
-  @JsonKey(required: true)
-  final String info;
+  BusRoute(this.pieces);
 
   @JsonKey(required: true)
   final List<StopInRoute> pieces;
