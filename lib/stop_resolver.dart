@@ -76,8 +76,10 @@ class StopResolver {
     // currentLongi=degreeToRadian(currentLongi);
     double minDistance = 999; //placeholder
     double tempDist;
-    int index = 0;
-    for (int i = 0; i < _stops.length; i++) {
+    int index = 0;  
+    int length=chosenStops.length;
+    print("debug: the list length is $length");
+    for (int i = 0; i < chosenStops.length; i++) {
       tempDist = point.distance(currentPoint, chosenStops[i]);
       print("debug: calculated distance is $tempDist");
       if (tempDist < minDistance) {
