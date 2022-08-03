@@ -37,7 +37,8 @@ class StopResolver {
 
   int resolve(double currentLati, double currentLongi) {
     var currentp = point(currentLati, currentLongi);
-    int closest = findClosest(currentp, _stops + _jumpPoints, 0.0000000001);
+    int closest = findClosest(currentp, _stops + _jumpPoints, 0.0001);
+    print("debug: the closest is: $closest");
     if (closest >= _stops.length) {//if the bus is closes to a jump point
       if (!detecting[closest - _stops.length]) {
         return current;
@@ -73,11 +74,12 @@ class StopResolver {
     //expects stops to be a list of list of two doubles which indicates Latitude and Longitude
     //currentLati=degreeToRadian(currentLati);
     // currentLongi=degreeToRadian(currentLongi);
-    double minDistance = 999;
+    double minDistance = 999; //placeholder
     double tempDist;
     int index = 0;
     for (int i = 0; i < _stops.length; i++) {
       tempDist = point.distance(currentPoint, chosenStops[i]);
+      print("debug: calculated distance is $tempDist");
       if (tempDist < minDistance) {
         minDistance = tempDist;
         index = i;
