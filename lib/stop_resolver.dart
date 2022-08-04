@@ -76,7 +76,7 @@ class StopResolver {
     double minDistance = 999;
     double tempDist;
     int index = 0;
-    for (int i = 0; i < _stops.length; i++) {
+    for (int i = _stops.length-1; i >=0; i--) { //The check is from end to start to avoid the duplicate problem
       tempDist = point.distance(currentPoint, chosenStops[i]);
       if (tempDist < minDistance) {
         minDistance = tempDist;
