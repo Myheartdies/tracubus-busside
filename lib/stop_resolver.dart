@@ -79,7 +79,9 @@ class StopResolver {
     int index = 0;  
     int length=chosenStops.length;
     print("debug: the list length is $length");
-    for (int i = chosenStops.length; i >=0; i--) {
+
+    for (int i = chosenStops.length-1; i >=0; i--) {
+
       tempDist = point.distance(currentPoint, chosenStops[i]);
       print("debug: calculated distance is $tempDist");
       if (tempDist < minDistance) {
