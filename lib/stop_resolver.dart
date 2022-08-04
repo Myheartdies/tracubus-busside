@@ -37,9 +37,10 @@ class StopResolver {
 
   int resolve(double currentLati, double currentLongi) {
     var currentp = point(currentLati, currentLongi);
-    int closest = findClosest(currentp, _stops + _jumpPoints, 0.0001);
+    int closest = findClosest(currentp, _stops + _jumpPoints, 0.0001, current);
     print("debug: the closest is: $closest");
-    if (closest >= _stops.length) {//if the bus is closes to a jump point
+    if (closest >= _stops.length) {
+      //if the bus is closes to a jump point
       if (!detecting[closest - _stops.length]) {
         return current;
       }
@@ -48,18 +49,21 @@ class StopResolver {
       }
       current = closest - _stops.length;
       return current;
-    } else if (closest > -1) {// if the bus is closest to a stop check status:
-      if (closest == current + 1) {//if this is the natural next stop, change current stop
+    } else if (closest > -1) {
+      // if the bus is closest to a stop check status:
+      if (closest == current + 1) {
+        //if this is the natural next stop, change current stop
         current = closest;
         for (int i = 0; i < detecting.length; i++) {
-          detecting[i] = false;//clear detecting list
+          detecting[i] = false; //clear detecting list
         }
         return current;
       }
-      if (closest <= current) { // if this is a stop already arrived before, ignore
+      if (closest <= current) {
+        // if this is a stop already arrived before, ignore
         return current;
       }
-      detecting[closest] = true;// if it is none of the above, add the 
+      detecting[closest] = true; // if it is none of the above, add the
       return current;
     } else if (closest == -1) {
       return current;
@@ -69,24 +73,27 @@ class StopResolver {
     return -1;
   }
 
-  int findClosest(
-      point currentPoint, List<point> chosenStops, double maxviable) {
+  int findClosest(point currentPoint, List<point> chosenStops, double maxviable,
+      int current) {
     //expects stops to be a list of list of two doubles which indicates Latitude and Longitude
     //currentLati=degreeToRadian(currentLati);
     // currentLongi=degreeToRadian(currentLongi);
-    double minDistance = 999; //placeholder
+    double minDistance = 999; //arbitrary big number
     double tempDist;
-    int index = 0;  
-    int length=chosenStops.length;
+    int index = 0;
+    int length = chosenStops.length;
     print("debug: the list length is $length");
-
-    for (int i = chosenStops.length-1; i >=0; i--) {
-
+    for (int i = 0; i < chosenStops.length; i++) {
       tempDist = point.distance(currentPoint, chosenStops[i]);
       print("debug: calculated distance is $tempDist");
       if (tempDist < minDistance) {
         minDistance = tempDist;
         index = i;
+      }
+      else if(tempDist==minDistance){
+        if(current>i){
+          continue;
+        }
       }
     }
     if (minDistance > maxviable) {
