@@ -217,7 +217,7 @@ class _OnGoingState extends State<OnGoing> {
                   '''
 若路線切換或者您已到達終點，
 點按“返回主頁”按鈕
-以回到主页重新选取路线
+以回到主頁重新選取路線
 ''',
                   textAlign: TextAlign.center,
                   style: TextStyle(
