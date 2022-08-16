@@ -15,6 +15,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:provider/provider.dart';
 
 import 'stop_resolver.dart';
+import 'package:wakelock/wakelock.dart';
 
 class OnGoing extends StatefulWidget {
   final String lineNum;
@@ -76,6 +77,7 @@ class _OnGoingState extends State<OnGoing> {
       status = "connecting";
       resolver = Provider.of<RecordModel>(context, listen: false)
           .GetResolver(widget.lineNum);
+      Wakelock.enable(); //force the device to keep awake
     });
 
     connect(uri);
@@ -337,6 +339,7 @@ class _OnGoingState extends State<OnGoing> {
         _clicked = true;
       });
       print("clicked on button");
+      Wakelock.disable(); //stop force awake
       _sendTrajectory();
       Navigator.pop(context);
     }
