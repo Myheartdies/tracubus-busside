@@ -39,8 +39,8 @@ dependencies:
  # sse: ^4.1.0
   html: ^0.15.0
   location: ^4.3.0
-  geolocator: ^8.0.3
-  geolocator_web: ^2.1.4
+  # geolocator: ^8.0.3
+  # geolocator_web: ^2.1.4
   web_socket_channel: ^2.1.0
   json_serializable: ^6.1.4
   device_info_plus: ^3.2.1
