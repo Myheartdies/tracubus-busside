@@ -16,6 +16,7 @@ import 'package:provider/provider.dart';
 
 import 'stop_resolver.dart';
 import 'package:wakelock/wakelock.dart';
+import 'package:workmanager/workmanager.dart';
 
 class OnGoing extends StatefulWidget {
   final String lineNum;
