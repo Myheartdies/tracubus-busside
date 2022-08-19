@@ -81,8 +81,14 @@ class _OnGoingState extends State<OnGoing> {
     });
 
     connect(uri);
+    location.onLocationChanged.listen((LocationData currentLocation) {
+      if (currentLocation != null) {
+        _locationData = currentLocation;
+      }
+    });
     _timer = Timer.periodic(const Duration(milliseconds: 1100), (timer) {
-      // timestamp = DateTime.now().microsecondsSinceEpoch; //the timestamp value assignment is moved to timer
+      timestamp = DateTime.now()
+          .microsecondsSinceEpoch; //the timestamp value assignment is moved to timer
       currentStop =
           resolver.resolve(_locationData.latitude!, _locationData.longitude!);
       if (status == "no") {
@@ -184,20 +190,20 @@ class _OnGoingState extends State<OnGoing> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              StreamBuilder(
-                  stream: location.onLocationChanged,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      //resolver.resolve(currentLati, currentLongi)
-                      var loc = snapshot.data as LocationData;
-                      _locationData = loc;
-                      // resolver.resolve(_locationData.latitude!, _locationData.longitude!)
-                      timestamp = DateTime.now().microsecondsSinceEpoch;
-                      return Container();
-                    } else {
-                      return Container();
-                    }
-                  }),
+              // StreamBuilder(
+              //     stream: location.onLocationChanged,
+              //     builder: (context, snapshot) {
+              //       if (snapshot.hasData) {
+              //         //resolver.resolve(currentLati, currentLongi)
+              //         var loc = snapshot.data as LocationData;
+              //         _locationData = loc;
+              //         // resolver.resolve(_locationData.latitude!, _locationData.longitude!)
+              //         // timestamp = DateTime.now().microsecondsSinceEpoch;
+              //         return Container();
+              //       } else {
+              //         return Container();
+              //       }
+              //     }),
               Container(
                 padding: const EdgeInsets.all(8.0),
                 alignment: Alignment.center,
@@ -299,6 +305,12 @@ class _OnGoingState extends State<OnGoing> {
         return;
       }
     }
+    try {
+      await location.enableBackgroundMode(enable: true);
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+    // location.enableBackgroundMode(enable: true);
     _locationData = await location.getLocation();
   }
 
