@@ -83,7 +83,7 @@ class _OnGoingState extends State<OnGoing> {
 
     connect(uri);
     _timer = Timer.periodic(const Duration(milliseconds: 1100), (timer) {
-      // timestamp = DateTime.now().microsecondsSinceEpoch; //the timestamp value assignment is moved to timer
+      timestamp = DateTime.now().microsecondsSinceEpoch; //the timestamp value assignment is moved to timer
       currentStop =
           resolver.resolve(_locationData.latitude!, _locationData.longitude!);
       if (status == "no") {
@@ -193,7 +193,7 @@ class _OnGoingState extends State<OnGoing> {
                       var loc = snapshot.data as LocationData;
                       _locationData = loc;
                       // resolver.resolve(_locationData.latitude!, _locationData.longitude!)
-                      timestamp = DateTime.now().microsecondsSinceEpoch;
+                      // timestamp = DateTime.now().microsecondsSinceEpoch;
                       return Container();
                     } else {
                       return Container();
