@@ -56,16 +56,22 @@ class _OnGoingState extends State<OnGoing> {
     'N': const Color.fromARGB(255, 172, 159, 196),
     'H': const Color.fromARGB(255, 130, 0, 149),
   };
+  final snackBar = SnackBar(
+    duration: const Duration(days: 2),
+    content: Text('與服務器連接中斷，正在重連...'),
+  );
 
   @override
   void dispose() {
     if (status == "yes") {
       _channel.sink.close();
     }
+
     _timer.cancel();
     if (listener != null) {
       listener.cancel();
     }
+
     super.dispose();
   }
 
@@ -79,7 +85,6 @@ class _OnGoingState extends State<OnGoing> {
           .GetResolver(widget.lineNum);
       Wakelock.enable(); //force the device to keep awake
     });
-
     connect(uri);
     location.onLocationChanged.listen((LocationData currentLocation) {
       if (currentLocation != null) {
@@ -95,6 +100,7 @@ class _OnGoingState extends State<OnGoing> {
         setState(() {
           status = "connecting";
         });
+        //  ScaffoldMessenger.of(context).showSnackBar(snackBar);
         connect(uri);
       }
       if (status == "connecting") {}
@@ -107,6 +113,10 @@ class _OnGoingState extends State<OnGoing> {
             timestamp,
             id,
             currentStop);
+        //  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      }
+      if (status == "pageclosed") {
+        // ScaffoldMessenger.of(context).hideCurrentSnackBar();
       }
     });
     initId();
@@ -204,6 +214,7 @@ class _OnGoingState extends State<OnGoing> {
               //         return Container();
               //       }
               //     }),
+              
               Container(
                 padding: const EdgeInsets.all(8.0),
                 alignment: Alignment.center,
@@ -256,11 +267,13 @@ class _OnGoingState extends State<OnGoing> {
                   handleClose();
                 },
               ),
+              connectionReminder(),
             ],
           ),
         ),
       ),
     );
+  
   }
 
   Widget contoured(String input) {
@@ -285,6 +298,20 @@ class _OnGoingState extends State<OnGoing> {
         ),
       ),
     ]);
+  }
+
+  Widget connectionReminder() {
+    if(status=="no"||status=="connecting")
+    return Text(
+      "與服務器連接中斷，正在重連...",
+      style: TextStyle(
+                    fontSize: 25,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.red,
+      ));
+    
+
+    return Container();
   }
 
   void locationSetup() async {
@@ -342,18 +369,24 @@ class _OnGoingState extends State<OnGoing> {
     var trajectory = {
       "trajectory": trajectoryrec,
     };
-    var response = await http.post(sendUri, body: jsonEncode(trajectory));
-    debugPrint('History sent, \nResponse status: ${response.statusCode}');
+    try {
+      var response = await http.post(sendUri, body: jsonEncode(trajectory));
+      debugPrint('History sent, \nResponse status: ${response.statusCode}');
+    } catch (e) {
+      debugPrint('History sending failed, error: ${e}');
+    }
   }
 
   void handleClose() async {
     if (!_clicked) {
       setState(() {
         _clicked = true;
+        status = "pageclosed";
       });
       print("clicked on button");
       Wakelock.disable(); //stop force awake
       _sendTrajectory();
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
       Navigator.pop(context);
     }
   }
