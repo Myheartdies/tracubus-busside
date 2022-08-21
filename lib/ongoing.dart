@@ -42,6 +42,7 @@ class _OnGoingState extends State<OnGoing> {
   late Timer _timer;
   int currentStop = 0;
   bool _clicked = false;
+  bool locationEnabled = true;
   var colormap = {
     '1A': const Color.fromARGB(255, 225, 221, 52),
     '1B': const Color.fromARGB(255, 225, 221, 52),
@@ -214,7 +215,7 @@ class _OnGoingState extends State<OnGoing> {
               //         return Container();
               //       }
               //     }),
-              
+
               Container(
                 padding: const EdgeInsets.all(8.0),
                 alignment: Alignment.center,
@@ -268,12 +269,12 @@ class _OnGoingState extends State<OnGoing> {
                 },
               ),
               connectionReminder(),
+              gpsReminder(),
             ],
           ),
         ),
       ),
     );
-  
   }
 
   Widget contoured(String input) {
@@ -301,16 +302,28 @@ class _OnGoingState extends State<OnGoing> {
   }
 
   Widget connectionReminder() {
-    if(status=="no"||status=="connecting")
-    return Text(
-      "與服務器連接中斷，正在重連...",
-      style: TextStyle(
-                    fontSize: 25,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.red,
-      ));
-    
+    if (status == "no" || status == "connecting")
+      return Text("*與服務器連接中斷，正在重連...",
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w500,
+            color: Colors.red,
+          ));
+    return Container();
+  }
 
+  Widget gpsReminder() {
+    if (!locationEnabled)
+      return Text('''
+*位置服務開啟失敗，
+請確認GPS已經開啟，
+並允許訪問位置''',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w500,
+            color: Colors.red,
+          ));
     return Container();
   }
 
@@ -321,6 +334,7 @@ class _OnGoingState extends State<OnGoing> {
       //locationMsg = 'service disabled';
       _serviceEnabled = await location.requestService();
       if (!_serviceEnabled) {
+        locationEnabled = false;
         return;
       }
     }
@@ -329,6 +343,7 @@ class _OnGoingState extends State<OnGoing> {
       print("permission denied");
       _permissionGranted = await location.requestPermission();
       if (_permissionGranted != PermissionStatus.granted) {
+        locationEnabled = false;
         return;
       }
     }
@@ -338,6 +353,7 @@ class _OnGoingState extends State<OnGoing> {
       debugPrint(e.toString());
     }
     // location.enableBackgroundMode(enable: true);
+    locationEnabled = true;
     _locationData = await location.getLocation();
   }
 
