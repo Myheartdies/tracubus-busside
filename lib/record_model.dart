@@ -52,14 +52,17 @@ class RecordModel extends ChangeNotifier {
       _stops[key] = point(points[value].latitude,
           points[value].longitude); //get value of stops name->point
     });
+    
     busInfo.routes.forEach((routename, routeInfo) {
       _ResolverPile[routename] = StopResolver();
       routeInfo.pieces.forEach((stopInfo) {
         _ResolverPile[routename]!.addStop(_stops[stopInfo.stop]!);
         _ResolverPile[routename]!.addJp(points[stopInfo.jump]);
+        _ResolverPile[routename]!.addTime(stopInfo.time);
       });
     });
     preparationFinished = true;
+    print(_ResolverPile["3"]);
     notifyListeners();
   }
 

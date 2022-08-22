@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'record_model.dart';
 import 'dart:math';
@@ -15,14 +16,20 @@ class StopResolver {
     detecting.add(false);
   }
 
+  void addTime(int input) {
+    _time.add(input);
+  }
+
   List<point> _stops = []; //This is all stops of one bus route
   List<point> _jumpPoints =
       []; //This is all jumppoints of stops of one bus route
   List<bool> detecting = []; //TODO: initialize the detecting values
+  List<int> _time = [];
   bool isInOrder = true;
   int closest = 0;
   int current = 0; //the index of the stop bus currenty at
   bool listening = false;
+  DateTime lastReachTime = DateTime.now();
 
   // double PI = 3.1415926; //53589793238;
   // double degreeToRadian(double degree) {
@@ -42,6 +49,7 @@ class StopResolver {
     if (closest >= _stops.length) {
       //if the bus is closes to a jump point
       if (!detecting[closest - _stops.length]) {
+        lastReachTime = DateTime.now(); //change last reach time to current time
         return current;
       }
       for (int i = 0; i < detecting.length; i++) {
@@ -54,6 +62,7 @@ class StopResolver {
       if (closest == current + 1) {
         //if this is the natural next stop, change current stop
         current = closest;
+        lastReachTime = DateTime.now(); //Change last reach time to current time
         for (int i = 0; i < detecting.length; i++) {
           detecting[i] = false; //clear detecting list
         }
@@ -63,7 +72,8 @@ class StopResolver {
         // if this is a stop already arrived before, ignore
         return current;
       }
-      detecting[closest] = true; // if it is none of the above, add the
+      detecting[closest] =
+          true; // if it is none of the above, add the closest to detecting list
       return current;
     } else if (closest == -1) {
       return current;
@@ -82,16 +92,14 @@ class StopResolver {
     double tempDist;
     int index = 0;
     int length = chosenStops.length;
-    print("debug: the list length is $length");
+    debugPrint("debug: the list length is $length");
     for (int i = 0; i < chosenStops.length; i++) {
       tempDist = point.distance(currentPoint, chosenStops[i]);
-      print("debug: calculated distance is $tempDist");
       if (tempDist < minDistance) {
         minDistance = tempDist;
         index = i;
-      }
-      else if(tempDist==minDistance){
-        if(current>i){
+      } else if (tempDist == minDistance) {
+        if (current > i) {
           continue;
         }
       }
@@ -100,6 +108,21 @@ class StopResolver {
       return -1;
     }
     return index;
+  }
+
+  int timeRemain() {
+    print("time now is: "+DateTime.now().toString());
+    print("last reach time is: "+lastReachTime.toString());
+    print("difference in seconds:"+DateTime.now().difference(lastReachTime).inSeconds.toString());
+    try {
+      return max(
+          (_time[current + 1] -
+              (DateTime.now().difference(lastReachTime).inSeconds)),
+          0);
+    } catch (e) {
+      debugPrint("issue with time resolving");
+      return 0;
+    }
   }
 
   double bogusDistSquared(

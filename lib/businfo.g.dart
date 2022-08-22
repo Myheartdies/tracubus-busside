@@ -30,7 +30,7 @@ StopInRoute _$StopInRouteFromJson(Map<String, dynamic> json) {
   return StopInRoute(
     json['stop'] as String,
     (json['segs'] as List<dynamic>).map((e) => e as int).toList(),
-    (json['time'] as num).toDouble(),
+    json['time'] as int,
     json['jump'] as int,
   );
 }

@@ -26,7 +26,7 @@ class StopInRoute {
   final List<int> segs;
 
   @JsonKey(required: true)
-  final double time;
+  final int time;
 
   @JsonKey(required: true)
   final int jump;

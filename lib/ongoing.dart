@@ -113,11 +113,8 @@ class _OnGoingState extends State<OnGoing> {
             _locationData.latitude!,
             timestamp,
             id,
-            currentStop);
-        //  ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      }
-      if (status == "pageclosed") {
-        // ScaffoldMessenger.of(context).hideCurrentSnackBar();
+            currentStop,
+            resolver.timeRemain());
       }
     });
     initId();
@@ -359,10 +356,11 @@ class _OnGoingState extends State<OnGoing> {
 
 //Send json with address message to server
   void _sendMessage(String route, double longit, double speed, double latit,
-      int time, String id, int stop) {
+      int time, String id, int stop, int remaining) {
     debugPrint(longit.toString());
     debugPrint(latit.toString());
     debugPrint("id " + id);
+    debugPrint(remaining.toString());
     var info = {
       "route": route,
       "longitude": longit,
@@ -371,6 +369,7 @@ class _OnGoingState extends State<OnGoing> {
       "timestamp": time,
       "id": id,
       "stop": stop,
+      "remaining": remaining,
     };
     debugPrint(info.toString());
     Provider.of<RecordModel>(context, listen: false).store(info);
