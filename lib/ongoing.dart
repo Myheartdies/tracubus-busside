@@ -93,8 +93,7 @@ class _OnGoingState extends State<OnGoing> {
       }
     });
     _timer = Timer.periodic(const Duration(milliseconds: 1100), (timer) {
-      timestamp = DateTime.now()
-          .microsecondsSinceEpoch; //the timestamp value assignment is moved to timer
+      timestamp = (DateTime.now().millisecondsSinceEpoch)~/1000; //the timestamp value assignment is moved to timer
       currentStop =
           resolver.resolve(_locationData.latitude!, _locationData.longitude!);
       if (status == "no") {
