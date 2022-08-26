@@ -40,6 +40,20 @@ class RecordModel extends ChangeNotifier {
       return EmptyResolver();
     }
   }
+  EATcalculator GetCalculator(String route, int currentstop){
+    try{
+      if(_EATCalculatorPile.containsKey(route)){
+        if(_EATCalculatorPile[route]!.asMap().containsKey(currentstop)){
+          return _EATCalculatorPile[route]![currentstop];
+        }
+      }
+      return EATcalculator();
+    }
+    catch(e){
+      print(e);
+      return EmptyEATcalculator();
+    }
+  }
 
   convertInfo(Map<String, dynamic> data) {
     List<point> points = [];
