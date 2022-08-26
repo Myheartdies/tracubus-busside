@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'dart:io';
 import 'dart:math';
 import 'businfo.dart';
+import 'detailtime.dart';
 
 class point {
   double latitude;
@@ -22,6 +23,7 @@ class RecordModel extends ChangeNotifier {
   final Map<String, point> _stops = {};
   final List<point> _jumpPoints = [];
   Map<String, StopResolver> _ResolverPile = {};
+  Map<String, Map<int, EATcalculator>> _EATCalculatorPile = {};
 
   List<Map> get records => _records;
   Map<String, point> get stops => _stops;
@@ -52,7 +54,7 @@ class RecordModel extends ChangeNotifier {
       _stops[key] = point(points[value].latitude,
           points[value].longitude); //get value of stops name->point
     });
-    
+
     busInfo.routes.forEach((routename, routeInfo) {
       _ResolverPile[routename] = StopResolver();
       routeInfo.pieces.forEach((stopInfo) {
