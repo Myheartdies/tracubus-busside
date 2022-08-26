@@ -40,16 +40,16 @@ class RecordModel extends ChangeNotifier {
       return EmptyResolver();
     }
   }
-  EATcalculator GetCalculator(String route, int currentstop){
-    try{
-      if(_EATCalculatorPile.containsKey(route)){
-        if(_EATCalculatorPile[route]!.asMap().containsKey(currentstop)){
+
+  EATcalculator GetCalculator(String route, int currentstop) {
+    try {
+      if (_EATCalculatorPile.containsKey(route)) {
+        if (_EATCalculatorPile[route]!.asMap().containsKey(currentstop)) {
           return _EATCalculatorPile[route]![currentstop];
         }
       }
       return EATcalculator();
-    }
-    catch(e){
+    } catch (e) {
       print(e);
       return EmptyEATcalculator();
     }
@@ -71,11 +71,12 @@ class RecordModel extends ChangeNotifier {
 
     busInfo.routes.forEach((routename, routeInfo) {
       _ResolverPile[routename] = StopResolver();
-      _EATCalculatorPile[routename]=[];
+      _EATCalculatorPile[routename] = [];
       routeInfo.pieces.asMap().forEach((index, stopInfo) {
         _EATCalculatorPile[routename]!.add(EATcalculator());
-        stopInfo.segs.forEach((element) { 
-        _EATCalculatorPile[routename]![index].segmentAddPoint(points[element]);
+        stopInfo.segs.forEach((element) {
+          _EATCalculatorPile[routename]![index]
+              .segmentAddPoint(points[element]);
         });
         _ResolverPile[routename]!.addStop(_stops[stopInfo.stop]!);
         _ResolverPile[routename]!.addJp(points[stopInfo.jump]);

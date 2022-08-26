@@ -111,9 +111,10 @@ class StopResolver {
   }
 
   int timeRemain() {
-    print("time now is: "+DateTime.now().toString());
-    print("last reach time is: "+lastReachTime.toString());
-    print("difference in seconds:"+DateTime.now().difference(lastReachTime).inSeconds.toString());
+    print("time now is: " + DateTime.now().toString());
+    print("last reach time is: " + lastReachTime.toString());
+    print("difference in seconds:" +
+        DateTime.now().difference(lastReachTime).inSeconds.toString());
     try {
       return max(
           (_time[current + 1] -
