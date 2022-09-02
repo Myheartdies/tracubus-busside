@@ -17,6 +17,7 @@ class EATcalculator {
     total = _segment.length;
     tree = KDTree(_segment, distance, ['lati', 'longi']);
     _time = timeinput;
+    finalized=true;
   }
 
   void segmentAddPoint(point input) {

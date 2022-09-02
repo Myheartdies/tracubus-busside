@@ -81,7 +81,7 @@ class RecordModel extends ChangeNotifier {
         _ResolverPile[routename]!.addStop(_stops[stopInfo.stop]!);
         _ResolverPile[routename]!.addJp(points[stopInfo.jump]);
         _ResolverPile[routename]!.addTime(stopInfo.time);
-        _EATCalculatorPile[routename]![index].finalize(stopInfo.time);
+        _EATCalculatorPile[routename]![index].finalize(stopInfo.time);//finalize function partially as the addTime for EAT calculator
       });
     });
     preparationFinished = true;

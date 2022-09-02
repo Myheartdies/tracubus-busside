@@ -45,6 +45,7 @@ class _OnGoingState extends State<OnGoing> {
   int currentStop = 0;
   bool _clicked = false;
   bool locationEnabled = true;
+  int timeRemain = 0;
   var colormap = {
     '1A': const Color.fromARGB(255, 225, 221, 52),
     '1B': const Color.fromARGB(255, 225, 221, 52),
@@ -86,7 +87,8 @@ class _OnGoingState extends State<OnGoing> {
       status = "connecting";
       resolver = Provider.of<RecordModel>(context, listen: false)
           .GetResolver(widget.lineNum);
-      timeCalculators=Provider.of<RecordModel>(context, listen: false).GetCalculators(widget.lineNum);
+      timeCalculators = Provider.of<RecordModel>(context, listen: false)
+          .GetCalculators(widget.lineNum);
       Wakelock.enable(); //force the device to keep awake
     });
     connect(uri);
@@ -109,6 +111,13 @@ class _OnGoingState extends State<OnGoing> {
       }
       if (status == "connecting") {}
       if (status == "yes") {
+        try {
+          timeRemain = timeCalculators[currentStop]
+              .timeRemain(_locationData.latitude!, _locationData.longitude!);
+        } catch (e) {
+          print(e);
+          print("EAT calculator may not be ready");
+        }
         _sendMessage(
             widget.lineNum,
             _locationData.longitude!,
@@ -117,7 +126,7 @@ class _OnGoingState extends State<OnGoing> {
             timestamp,
             id,
             currentStop,
-            resolver.timeRemain());
+            timeRemain);
       }
     });
     initId();
