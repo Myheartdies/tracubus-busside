@@ -16,8 +16,13 @@ class EATcalculator {
   void finalize(int timeinput) {
     total = _segment.length;
     tree = KDTree(_segment, distance, ['lati', 'longi']);
+    try{
     _time = timeinput;
-    finalized=true;
+    }
+    catch(e){
+      _time=0;
+    }
+    finalized = true;
   }
 
   void segmentAddPoint(point input) {
@@ -25,25 +30,28 @@ class EATcalculator {
   }
 
   int timeRemain(double currentLati, double currentLongi) {
+    print("timeremain function evoked");
     if (!finalized) {
       print(
           "The detail time calculator is not finalized, returning dummy value");
       return 0;
     } else {
       if (_segment.length <= 1) {
+      print("current station is final stopA");
         return 0; //In this case, the current stop is the final stop
       } else {
         int closest = findclosest(currentLati, currentLongi);
         print("bus at point $closest of $total");
-        return (_time * closest / total).round();
+        return max((_time * (total - closest) / total).round(), 0);
       }
     }
   }
 
   int findclosest(double currentLati, double currentLongi) {
     var nearest = tree.nearest({'lati': currentLati, 'longi': currentLongi}, 1);
+    print(nearest);
     try {
-      return _segment.indexOf(nearest[0]);
+      return _segment.indexOf(nearest[0][0]);
     } catch (e) {
       return -1;
     }

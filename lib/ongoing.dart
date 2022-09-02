@@ -181,7 +181,7 @@ class _OnGoingState extends State<OnGoing> {
         });
       },
       onError: (error) {
-        debugPrint(timestamp.toString());
+        debugPrint("timestamp:"+timestamp.toString());
         print('ws error $error');
         setState(() {
           status = "no";
