@@ -49,6 +49,7 @@ dependencies:
   json_annotation: ^4.4.0
   wakelock: ^0.6.2
   workmanager: ^0.4.1
+  kdtree: ^0.2.0
 
 dev_dependencies:
   flutter_test:

@@ -58,7 +58,6 @@ class RecordModel extends ChangeNotifier {
   convertInfo(Map<String, dynamic> data) {
     List<point> points = [];
     //a pile of StopResolver that is mapped to each route
-
     BusInfo busInfo = BusInfo.fromJson(data);
 
     busInfo.points.forEach((element) {
@@ -74,9 +73,12 @@ class RecordModel extends ChangeNotifier {
       _EATCalculatorPile[routename] = [];
       routeInfo.pieces.asMap().forEach((index, stopInfo) {
         _EATCalculatorPile[routename]!.add(EATcalculator());
-        stopInfo.segs.forEach((element) {
-          _EATCalculatorPile[routename]![index]
-              .segmentAddPoint(points[element]);
+        stopInfo.segs.forEach((segIndex) {
+          //get all the segments for the piece
+          busInfo.segments[segIndex].forEach((pointIndex) {
+            _EATCalculatorPile[routename]![index]
+                .segmentAddPoint(points[pointIndex]);
+          });
         });
         _ResolverPile[routename]!.addStop(_stops[stopInfo.stop]!);
         _ResolverPile[routename]!.addJp(points[stopInfo.jump]);
