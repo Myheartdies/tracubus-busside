@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:async';
 import 'dart:math';
 
+import 'package:bus_side/detailtime.dart';
 import 'package:bus_side/record_model.dart';
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/io.dart';
@@ -40,6 +41,7 @@ class _OnGoingState extends State<OnGoing> {
   late LocationData _locationData;
   late int timestamp;
   late Timer _timer;
+  late List<EATcalculator> timeCalculators;
   int currentStop = 0;
   bool _clicked = false;
   bool locationEnabled = true;
@@ -84,6 +86,7 @@ class _OnGoingState extends State<OnGoing> {
       status = "connecting";
       resolver = Provider.of<RecordModel>(context, listen: false)
           .GetResolver(widget.lineNum);
+      timeCalculators=Provider.of<RecordModel>(context, listen: false).GetCalculators(widget.lineNum);
       Wakelock.enable(); //force the device to keep awake
     });
     connect(uri);
@@ -93,7 +96,8 @@ class _OnGoingState extends State<OnGoing> {
       }
     });
     _timer = Timer.periodic(const Duration(milliseconds: 1100), (timer) {
-      timestamp = (DateTime.now().millisecondsSinceEpoch)~/1000; //the timestamp value assignment is moved to timer
+      timestamp = (DateTime.now().millisecondsSinceEpoch) ~/
+          1000; //the timestamp value assignment is moved to timer
       currentStop =
           resolver.resolve(_locationData.latitude!, _locationData.longitude!);
       if (status == "no") {
@@ -197,21 +201,6 @@ class _OnGoingState extends State<OnGoing> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // StreamBuilder(
-              //     stream: location.onLocationChanged,
-              //     builder: (context, snapshot) {
-              //       if (snapshot.hasData) {
-              //         //resolver.resolve(currentLati, currentLongi)
-              //         var loc = snapshot.data as LocationData;
-              //         _locationData = loc;
-              //         // resolver.resolve(_locationData.latitude!, _locationData.longitude!)
-              //         // timestamp = DateTime.now().microsecondsSinceEpoch;
-              //         return Container();
-              //       } else {
-              //         return Container();
-              //       }
-              //     }),
-
               Container(
                 padding: const EdgeInsets.all(8.0),
                 alignment: Alignment.center,

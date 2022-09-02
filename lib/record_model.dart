@@ -41,17 +41,15 @@ class RecordModel extends ChangeNotifier {
     }
   }
 
-  EATcalculator GetCalculator(String route, int currentstop) {
+  List<EATcalculator> GetCalculators(String route) {
     try {
       if (_EATCalculatorPile.containsKey(route)) {
-        if (_EATCalculatorPile[route]!.asMap().containsKey(currentstop)) {
-          return _EATCalculatorPile[route]![currentstop];
-        }
+        return _EATCalculatorPile[route]!;
       }
-      return EATcalculator();
+      return [EATcalculator()];
     } catch (e) {
       print(e);
-      return EmptyEATcalculator();
+      return [EmptyEATcalculator()];
     }
   }
 
