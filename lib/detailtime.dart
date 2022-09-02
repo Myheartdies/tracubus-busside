@@ -7,13 +7,16 @@ class EATcalculator {
   int closest = 0;
   late KDTree tree;
   late int total;
+  late int _time;
   bool finalized = false;
-  var distance = (a, b) {
+  num distance(a, b) {
     return pow(a['lati'] - b['lati'], 2) + pow(a['longi'] - b['longi'], 2);
-  };
-  void finalize() {
+  }
+
+  void finalize(int timeinput) {
     total = _segment.length;
-    tree = KDTree(_segment, distance, ['lati','longi']);
+    tree = KDTree(_segment, distance, ['lati', 'longi']);
+    _time=timeinput;
   }
 
   void segmentAddPoint(point input) {
@@ -33,6 +36,7 @@ class EATcalculator {
   }
 
   int findclosest(double currentLati, double currentLongi) {
+    var nearest=tree.nearest({'lati':currentLati,'longi':currentLongi}, 2);
     return -1;
   }
 }
