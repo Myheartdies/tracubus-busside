@@ -48,6 +48,7 @@ class EATcalculator {
   }
 
   int findclosest(double currentLati, double currentLongi) {
+    //Use kd tree to find closest point
     var nearest = tree.nearest({'lati': currentLati, 'longi': currentLongi}, 1);
     print(nearest);
     try {
