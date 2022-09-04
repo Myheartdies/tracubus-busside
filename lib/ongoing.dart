@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:async';
 import 'dart:math';
 
+import 'package:bus_side/detailtime.dart';
 import 'package:bus_side/record_model.dart';
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/io.dart';
@@ -40,9 +41,13 @@ class _OnGoingState extends State<OnGoing> {
   late LocationData _locationData;
   late int timestamp;
   late Timer _timer;
+  late List<EATcalculator> timeCalculators;
   int currentStop = 0;
   bool _clicked = false;
   bool locationEnabled = true;
+  int timeRemain = 0;
+  bool atStop = false;
+  int temp = -1;
   var colormap = {
     '1A': const Color.fromARGB(255, 225, 221, 52),
     '1B': const Color.fromARGB(255, 225, 221, 52),
@@ -84,6 +89,8 @@ class _OnGoingState extends State<OnGoing> {
       status = "connecting";
       resolver = Provider.of<RecordModel>(context, listen: false)
           .GetResolver(widget.lineNum);
+      timeCalculators = Provider.of<RecordModel>(context, listen: false)
+          .GetCalculators(widget.lineNum);
       Wakelock.enable(); //force the device to keep awake
     });
     connect(uri);
@@ -93,9 +100,12 @@ class _OnGoingState extends State<OnGoing> {
       }
     });
     _timer = Timer.periodic(const Duration(milliseconds: 1100), (timer) {
-      timestamp = (DateTime.now().millisecondsSinceEpoch)~/1000; //the timestamp value assignment is moved to timer
+      timestamp = (DateTime.now().millisecondsSinceEpoch) ~/
+          1000; //the timestamp value assignment is moved to timer
+      temp = currentStop;
       currentStop =
           resolver.resolve(_locationData.latitude!, _locationData.longitude!);
+      if (temp < currentStop) reachStop();
       if (status == "no") {
         setState(() {
           status = "connecting";
@@ -105,6 +115,15 @@ class _OnGoingState extends State<OnGoing> {
       }
       if (status == "connecting") {}
       if (status == "yes") {
+        try {
+          timeRemain = resolver.timeRemain();
+          // timeRemain = timeCalculators[currentStop]
+          //     .timeRemain(_locationData.latitude!, _locationData.longitude!);//This one is currently very buggy and needs tuning
+        } catch (e) {
+          print(e);
+          print("EAT calculator may not be ready");
+        }
+        // timeRemain=resolver.timeRemain();
         _sendMessage(
             widget.lineNum,
             _locationData.longitude!,
@@ -113,7 +132,7 @@ class _OnGoingState extends State<OnGoing> {
             timestamp,
             id,
             currentStop,
-            resolver.timeRemain());
+            timeRemain);
       }
     });
     initId();
@@ -168,7 +187,7 @@ class _OnGoingState extends State<OnGoing> {
         });
       },
       onError: (error) {
-        debugPrint(timestamp.toString());
+        debugPrint("timestamp:" + timestamp.toString());
         print('ws error $error');
         setState(() {
           status = "no";
@@ -197,21 +216,6 @@ class _OnGoingState extends State<OnGoing> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // StreamBuilder(
-              //     stream: location.onLocationChanged,
-              //     builder: (context, snapshot) {
-              //       if (snapshot.hasData) {
-              //         //resolver.resolve(currentLati, currentLongi)
-              //         var loc = snapshot.data as LocationData;
-              //         _locationData = loc;
-              //         // resolver.resolve(_locationData.latitude!, _locationData.longitude!)
-              //         // timestamp = DateTime.now().microsecondsSinceEpoch;
-              //         return Container();
-              //       } else {
-              //         return Container();
-              //       }
-              //     }),
-
               Container(
                 padding: const EdgeInsets.all(8.0),
                 alignment: Alignment.center,
@@ -353,6 +357,12 @@ class _OnGoingState extends State<OnGoing> {
     _locationData = await location.getLocation();
   }
 
+  void reachStop() async {
+    // This is evoked when the bus reach a new stop
+    atStop = true;
+    Future.delayed(const Duration(seconds: 10), () => {atStop = false});
+  }
+
 //Send json with address message to server
   void _sendMessage(String route, double longit, double speed, double latit,
       int time, String id, int stop, int remaining) {
@@ -369,6 +379,7 @@ class _OnGoingState extends State<OnGoing> {
       "id": id,
       "stop": stop,
       "remaining": remaining,
+      "atstop": atStop,
     };
     debugPrint(info.toString());
     Provider.of<RecordModel>(context, listen: false).store(info);

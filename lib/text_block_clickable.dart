@@ -23,7 +23,7 @@ class _ClickableTextBlockState extends State<ClickableTextBlock> {
               builder: (context) =>
                   OnGoing(lineNum: widget.lineNum, id: widget.id)),
         );
-        print("Tapped on container");
+        debugPrint("Tapped on container");
       },
       child: Container(
         alignment: Alignment.center,

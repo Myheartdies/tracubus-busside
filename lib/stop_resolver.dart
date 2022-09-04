@@ -31,18 +31,9 @@ class StopResolver {
   bool listening = false;
   DateTime lastReachTime = DateTime.now();
 
-  // double PI = 3.1415926; //53589793238;
-  // double degreeToRadian(double degree) {
-  //   return degree * PI / 180;
-  // }
-
-  // Iterable<int> backto(int num) sync* {
-  //   while (num > 0) {
-  //     yield num--;
-  //   }
-  // }
-
   int resolve(double currentLati, double currentLongi) {
+    //This currently does not determine the exact moment the bus enter the stop,
+    //but the stop the bus is closest to on the route
     var currentp = point(currentLati, currentLongi);
     int closest = findClosest(currentp, _stops + _jumpPoints, 0.0001, current);
     print("debug: the closest is: $closest");
@@ -86,8 +77,6 @@ class StopResolver {
   int findClosest(point currentPoint, List<point> chosenStops, double maxviable,
       int current) {
     //expects stops to be a list of list of two doubles which indicates Latitude and Longitude
-    //currentLati=degreeToRadian(currentLati);
-    // currentLongi=degreeToRadian(currentLongi);
     double minDistance = 999; //arbitrary big number
     double tempDist;
     int index = 0;
@@ -111,9 +100,11 @@ class StopResolver {
   }
 
   int timeRemain() {
-    print("time now is: "+DateTime.now().toString());
-    print("last reach time is: "+lastReachTime.toString());
-    print("difference in seconds:"+DateTime.now().difference(lastReachTime).inSeconds.toString());
+    //The return value is the surveyed average time between stops minus the time the bus has left the current stop
+    print("time now is: " + DateTime.now().toString());
+    print("last reach time is: " + lastReachTime.toString());
+    print("difference in seconds:" +
+        DateTime.now().difference(lastReachTime).inSeconds.toString());
     try {
       return max(
           (_time[current + 1] -
