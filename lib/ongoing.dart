@@ -46,7 +46,8 @@ class _OnGoingState extends State<OnGoing> {
   bool _clicked = false;
   bool locationEnabled = true;
   int timeRemain = 0;
-  bool atStop=false;
+  bool atStop = false;
+  int temp = -1;
   var colormap = {
     '1A': const Color.fromARGB(255, 225, 221, 52),
     '1B': const Color.fromARGB(255, 225, 221, 52),
@@ -101,8 +102,10 @@ class _OnGoingState extends State<OnGoing> {
     _timer = Timer.periodic(const Duration(milliseconds: 1100), (timer) {
       timestamp = (DateTime.now().millisecondsSinceEpoch) ~/
           1000; //the timestamp value assignment is moved to timer
+      temp = currentStop;
       currentStop =
           resolver.resolve(_locationData.latitude!, _locationData.longitude!);
+      if (temp < currentStop) reachStop();
       if (status == "no") {
         setState(() {
           status = "connecting";
@@ -113,13 +116,14 @@ class _OnGoingState extends State<OnGoing> {
       if (status == "connecting") {}
       if (status == "yes") {
         try {
-          timeRemain = timeCalculators[currentStop]
-              .timeRemain(_locationData.latitude!, _locationData.longitude!);//This one is currently very buggy and needs tuning
+          timeRemain = resolver.timeRemain();
+          // timeRemain = timeCalculators[currentStop]
+          //     .timeRemain(_locationData.latitude!, _locationData.longitude!);//This one is currently very buggy and needs tuning
         } catch (e) {
           print(e);
           print("EAT calculator may not be ready");
         }
-        // timeRemain=resolver.timeRemain(); 
+        // timeRemain=resolver.timeRemain();
         _sendMessage(
             widget.lineNum,
             _locationData.longitude!,
@@ -183,7 +187,7 @@ class _OnGoingState extends State<OnGoing> {
         });
       },
       onError: (error) {
-        debugPrint("timestamp:"+timestamp.toString());
+        debugPrint("timestamp:" + timestamp.toString());
         print('ws error $error');
         setState(() {
           status = "no";
@@ -353,10 +357,11 @@ class _OnGoingState extends State<OnGoing> {
     _locationData = await location.getLocation();
   }
 
-void reachStop() async{// This is evoked when the bus reach a new stop
-  atStop=true;
-  Future.delayed(const Duration(seconds: 10),()=>{atStop=false});
-}
+  void reachStop() async {
+    // This is evoked when the bus reach a new stop
+    atStop = true;
+    Future.delayed(const Duration(seconds: 10), () => {atStop = false});
+  }
 
 //Send json with address message to server
   void _sendMessage(String route, double longit, double speed, double latit,
