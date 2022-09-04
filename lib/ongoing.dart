@@ -46,6 +46,7 @@ class _OnGoingState extends State<OnGoing> {
   bool _clicked = false;
   bool locationEnabled = true;
   int timeRemain = 0;
+  bool atStop=false;
   var colormap = {
     '1A': const Color.fromARGB(255, 225, 221, 52),
     '1B': const Color.fromARGB(255, 225, 221, 52),
@@ -352,6 +353,11 @@ class _OnGoingState extends State<OnGoing> {
     _locationData = await location.getLocation();
   }
 
+void reachStop() async{// This is evoked when the bus reach a new stop
+  atStop=true;
+  Future.delayed(const Duration(seconds: 10),()=>{atStop=false});
+}
+
 //Send json with address message to server
   void _sendMessage(String route, double longit, double speed, double latit,
       int time, String id, int stop, int remaining) {
@@ -368,6 +374,7 @@ class _OnGoingState extends State<OnGoing> {
       "id": id,
       "stop": stop,
       "remaining": remaining,
+      "atstop": atStop,
     };
     debugPrint(info.toString());
     Provider.of<RecordModel>(context, listen: false).store(info);
