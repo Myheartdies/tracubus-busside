@@ -113,11 +113,12 @@ class _OnGoingState extends State<OnGoing> {
       if (status == "yes") {
         try {
           timeRemain = timeCalculators[currentStop]
-              .timeRemain(_locationData.latitude!, _locationData.longitude!);
+              .timeRemain(_locationData.latitude!, _locationData.longitude!);//This one is currently very buggy and needs tuning
         } catch (e) {
           print(e);
           print("EAT calculator may not be ready");
         }
+        // timeRemain=resolver.timeRemain(); 
         _sendMessage(
             widget.lineNum,
             _locationData.longitude!,

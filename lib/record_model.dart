@@ -10,6 +10,25 @@ class point {
   double longitude;
   point(this.latitude, this.longitude);
   static double distance(point p1, point p2) {
+    //This return distance in meters, but for some reason break the algorithm
+    // double lat1 = p1.latitude;
+    // double lon1 = p1.longitude;
+    // double lat2 = p2.latitude;
+    // double lon2 = p2.longitude;
+    // double R = 6378.137; //Radius of earth in KM
+    // double dLat = lat2 * pi / 180 - lat1 * pi / 180;
+    // double dLon = lon2 * pi / 180 - lon1 * pi / 180;
+    // double a = sin(dLat / 2) * sin(dLat / 2) +
+    //     cos(lat1 * pi / 180) *
+    //         cos(lat2 * pi / 180) *
+    //         sin(dLon / 2) *
+    //         sin(dLon / 2);
+    // double c=2*atan2(sqrt(a),sqrt(1-a));
+    // double d=R*c;
+    // return d*1000;
+
+    // This return the sum of squares of the latitude and longitude difference
+    // Not exactly an accurate measurement of distance, but can be used for comparing distances
     return (pow(p1.latitude - p2.latitude, 2) +
             pow(p1.longitude - p2.longitude, 2))
         .toDouble();
@@ -81,7 +100,8 @@ class RecordModel extends ChangeNotifier {
         _ResolverPile[routename]!.addStop(_stops[stopInfo.stop]!);
         _ResolverPile[routename]!.addJp(points[stopInfo.jump]);
         _ResolverPile[routename]!.addTime(stopInfo.time);
-        _EATCalculatorPile[routename]![index].finalize(stopInfo.time);//finalize function partially as the addTime for EAT calculator
+        _EATCalculatorPile[routename]![index].finalize(stopInfo.time);
+        //finalize function partially as the addTime for EAT calculator
       });
     });
     preparationFinished = true;
